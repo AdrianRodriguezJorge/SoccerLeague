@@ -1,0 +1,74 @@
+* {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+ }
+ body, html {
+     width: 100%;
+     height: 100%;
+     font-family: Arial, sans-serif;
+ }
+ .container {
+     display: flex;
+     flex-direction: column;
+     height: 100vh;
+ }
+ .pnTitulo {
+     background-color: #042944;
+     color: white;
+     display: flex;
+     justify-content: flex-end;
+     padding: 5px;
+ }
+ #btnClose {
+     background: none;
+     border: none;
+     color: white;
+     font-size: 16px;
+     cursor: pointer;
+ }
+ .content {
+     display: flex;
+     flex: 1;
+ }
+ .pnMenu {
+     width: 120px;
+     background-color: #042944;
+     color: white;
+     padding: 10px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+ }
+ .user-info {
+     margin-bottom: 20px;
+     text-align: center;
+ }
+ button {
+     background-color: #042944;
+     color: white;
+     border: none;
+     padding: 10px;
+     margin: 5px 0;
+     cursor: pointer;
+     width: 100%;
+     text-align: center;
+ }
+ .pnFormularios {
+     background-color: white;
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     color: #6A5ACD;
+ }
+ #lblHora {
+     font-size: 60px;
+     color: #1E90FF;
+ }
+ #lblFecha {
+     font-size: 30px;
+     color: slategray;
+ }
+ 

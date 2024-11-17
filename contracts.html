@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Contratos</title>
+    <link rel="stylesheet" href="style_contracts.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Contratos</h1>
+        <input type="text" id="searchInput" placeholder="Buscar contrato..." oninput="filterContracts()">
+        <button onclick="newContract()">Nuevo Contrato</button>
+        <button onclick="editContract()">Modificar Contrato</button>
+        <button onclick="deleteContract()">Eliminar Contrato</button>
+
+        <table id="contractsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Contrato</th>
+                    <th>Cliente</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Vigencia</th>
+                </tr>
+            </thead>
+            <tbody id="contractsBody">
+                <!-- Rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script_contracts.js"></script>
+</body>
+</html>
