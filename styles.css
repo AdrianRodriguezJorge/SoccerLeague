@@ -1,0 +1,18 @@
+body {
+    background-color: #3C3F40;
+}
+.navbar, .dropdown-menu {
+    background-color: #2E2E2E;
+}
+.navbar-brand, .nav-link {
+    color: white !important;
+}
+.dropdown-item {
+    color: black !important;
+}
+.dropdown-item:hover {
+    background-color: #D9F2DC;
+}
+.container {
+    margin-top: 20px;
+}
