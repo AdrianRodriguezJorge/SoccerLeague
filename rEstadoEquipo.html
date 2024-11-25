@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,7 +82,7 @@
 
         populateSelect('equipo', equipos);
 
-        document.getElementById('btn-generar-reporte').addEventListener('click', function() {
+        document.getElementById('btn-generar-reporte').addEventListener('click', function () {
             const selectedIndex = document.getElementById('equipo').selectedIndex;
             const reporte = {
                 totalGanados: 10,
@@ -105,7 +106,7 @@
             document.getElementById('visitante-perdidos').textContent = reporte.visitantePerdidos;
         });
 
-        document.getElementById('btn-imprimir-reporte').addEventListener('click', function() {
+        document.getElementById('btn-imprimir-reporte').addEventListener('click', function () {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -116,10 +117,11 @@
         });
 
         function irPaginaPrincipal() {
-            window.location.href = './principal.html'; 
-         }
+            window.location.href = './principal.html';
+        }
 
 
     </script>
 </body>
+
 </html>
