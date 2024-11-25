@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,22 @@
         .main-container {
             margin-top: 50px;
         }
+
+        body {
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
     </style>
+
+
 </head>
 
 <body>
@@ -46,7 +62,7 @@
                         <a class="dropdown-item" href="crudEquipo.html">Equipos</a>
                         <a class="dropdown-item" href="crudPartido.html">Partidos</a>
                         <a class="dropdown-item" href="crudFutbolista.html">Futbolistas</a>
-                        <a class="dropdown-item" href="#" id="iniciarLiga" style="display:none;">Comenzar la liga</a>
+                        <a class="dropdown-item" href="#" id="iniciarLiga">Comenzar la liga</a>
                         <a class="dropdown-item" href="#" id="culminarLiga" style="display:none;">Culminar la liga</a>
                     </div>
                 </li>
@@ -82,6 +98,33 @@
         <p>Bienvenido al sistema de gestión de la liga.</p>
     </div>
 
+    <!-- Modal para seleccionar la fecha de duración de la liga -->
+    <div class="modal fade" id="modalFechaLiga" tabindex="-1" aria-labelledby="modalFechaLigaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalFechaLigaLabel">Duración de la Liga</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formFechaLiga">
+                        <div class="form-group">
+                            <label for="fechaInicio">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaFin">Fecha de Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
@@ -89,6 +132,9 @@
     <script>
         // Simulación de inicio y cierre de sesión
         let usuarioActual = "UsuarioEjemplo"; // Este valor debe ser dinámico, obtenido del sistema de autenticación
+        let ligaIniciada = false;
+        let fechaInicioLiga = null;
+        let fechaFinLiga = null;
 
         function actualizarEstadoUsuario() {
             if (usuarioActual) {
@@ -102,6 +148,17 @@
             }
         }
 
+        function actualizarEstadoLiga() {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (ligaIniciada) {
+                document.getElementById('iniciarLiga').style.display = 'none';
+                document.getElementById('culminarLiga').style.display = 'block';
+            } else {
+                document.getElementById('iniciarLiga').style.display = 'block';
+                document.getElementById('culminarLiga').style.display = 'none';
+            }
+        }
+
         document.getElementById('iniciarSesion').addEventListener('click', function () {
             usuarioActual = "UsuarioEjemplo"; // Este valor debe ser dinámico, obtenido del sistema de autenticación
             actualizarEstadoUsuario();
@@ -112,8 +169,43 @@
             actualizarEstadoUsuario();
         });
 
-        // Inicializar el estado del usuario al cargar la página
+        document.getElementById('iniciarLiga').addEventListener('click', function () {
+            $('#modalFechaLiga').modal('show');
+        });
+
+        document.getElementById('formFechaLiga').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFin = document.getElementById('fechaFin').value;
+            const hoy = new Date().toISOString().split('T')[0];
+
+            if (fechaInicio >= hoy && fechaFin >= fechaInicio) {
+                ligaIniciada = true;
+                fechaInicioLiga = fechaInicio;
+                fechaFinLiga = fechaFin;
+                actualizarEstadoLiga();
+                $('#modalFechaLiga').modal('hide');
+            } else {
+                alert('Las fechas no son válidas. La fecha de inicio debe ser posterior a la actual y la fecha de fin debe ser posterior a la fecha de inicio.');
+            }
+        });
+
+        document.getElementById('culminarLiga').addEventListener('click', function () {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (hoy >= fechaInicioLiga && hoy <= fechaFinLiga) {
+                ligaIniciada = false;
+                fechaInicioLiga = null;
+                fechaFinLiga = null;
+                actualizarEstadoLiga();
+                alert('La liga ha sido culminada con éxito.');
+            } else {
+                alert('No se puede culminar la liga fuera de las fechas de duración.');
+            }
+        });
+
+        // Inicializar el estado del usuario y de la liga al cargar la página
         actualizarEstadoUsuario();
+        actualizarEstadoLiga();
     </script>
 </body>
 
