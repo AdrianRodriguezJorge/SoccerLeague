@@ -12,7 +12,6 @@
 </head>
 
 <body>
-    <!-- Main Content -->
     <div class="container main-container">
         <h1>Estado de un Equipo</h1>
         <div class="row">
@@ -60,7 +59,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS y dependencias -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -68,7 +66,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        // Simulación de manejo de equipos
         let equipos = ['Equipo 1', 'Equipo 2']; // ejemplo
 
         function populateSelect(id, options) {
@@ -86,7 +83,6 @@
 
         document.getElementById('btn-generar-reporte').addEventListener('click', function() {
             const selectedIndex = document.getElementById('equipo').selectedIndex;
-            // Cambiar cuando tengamos BD
             const reporte = {
                 totalGanados: 10,
                 localGanados: 6,
@@ -98,7 +94,6 @@
                 localPerdidos: 1,
                 visitantePerdidos: 2
             };
-            // Actualizar tabla con datos del reporte
             document.getElementById('total-ganados').textContent = reporte.totalGanados;
             document.getElementById('local-ganados').textContent = reporte.localGanados;
             document.getElementById('visitante-ganados').textContent = reporte.visitanteGanados;
@@ -110,7 +105,6 @@
             document.getElementById('visitante-perdidos').textContent = reporte.visitantePerdidos;
         });
 
-        // Función para exportar a pdf
         document.getElementById('btn-imprimir-reporte').addEventListener('click', function() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -121,7 +115,6 @@
             doc.save('reporte_estado_equipo.pdf');
         });
 
-        // Función para regresar a la página principal
         function irPaginaPrincipal() {
             window.location.href = './principal.html'; 
          }

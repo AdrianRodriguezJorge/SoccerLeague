@@ -16,7 +16,6 @@
     </style>
 </head>
 <body>
-    <!-- Main Content -->
     <div class="container main-container">
         <h1>Equipo todo estrellas</h1>
         <button type="button" class="btn btn-primary" id="btn-imprimir-reporte">
@@ -32,12 +31,10 @@
                 </tr>
             </thead>
             <tbody id="reporte-tabla">
-                <!-- Aquí se llenará con los datos del reporte -->
             </tbody>
         </table>
     </div>
 
-    <!-- Bootstrap JS y dependencias -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -45,11 +42,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        // Ejemplo de datos, debe ser reemplazado con una llamada a la API o servicio
         const reporte = [
             { posicion: 'Portero', nombre: 'Jugador 1', equipo: 'Equipo 1', estadisticas: '10 paradas' },
             { posicion: 'Defensa', nombre: 'Jugador 2', equipo: 'Equipo 2', estadisticas: '5 intercepciones' },
-            // agregar más datos de ejemplo según sea necesario
         ];
 
         const tablaCuerpo = document.getElementById('reporte-tabla');

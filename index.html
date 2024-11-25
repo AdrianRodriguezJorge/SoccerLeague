@@ -48,24 +48,20 @@
         document.getElementById('btn-login').addEventListener('click', function() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
-            if(username === 'demo' && password === 'demo') {
-                window.location.href = 'principal.html'; // Redirigir a la página principal
+            if(username === 'admin' && password === 'admin') {
+                window.location.href = 'principal.html';
             } else {
-                if(username !== 'demo') {
+                if(username !== 'admin') {
                     document.getElementById('error-username').style.display = 'block';
                 }
-                if(password !== 'demo') {
+                if(password !== 'admin') {
                     document.getElementById('error-password').style.display = 'block';
                 }
             }
         });
 
         document.getElementById('btn-cancel').addEventListener('click', function() {
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('error-username').style.display = 'none';
-            document.getElementById('error-password').style.display = 'none';
-            window.location.href = 'principal.html'; // Redirigir a la página principal
+            window.location.href = 'principal.html'; 
         });
     </script>
 </body>
