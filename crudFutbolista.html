@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Futbolistas</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .main-container {
+            margin-top: 50px;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="principal.html">Liga Nacional de Fútbol</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <!-- Perfil Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Perfil
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="perfilDropdown">
+                        <a class="dropdown-item" href="#" id="iniciarSesion">Iniciar sesión</a>
+                        <a class="dropdown-item" href="#" id="cerrarSesion" style="display:none;">Cerrar sesión</a>
+                        <a class="dropdown-item" href="#">Gestión de usuarios</a>
+                    </div>
+                </li>
+                <!-- Gestión de la Liga Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="gestionLigaDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Gestión de la liga
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="gestionLigaDropdown">
+                        <a class="dropdown-item" href="crudEstadio.html">Estadios</a>
+                        <a class="dropdown-item" href="crudEquipo.html">Equipos</a>
+                        <a class="dropdown-item" href="crudPartido.html">Partidos</a>
+                        <a class="dropdown-item" href="crudFutbolista.html">Futbolistas</a>
+                        <a class="dropdown-item" href="#" id="iniciarLiga" style="display:none;">Comenzar la liga</a>
+                        <a class="dropdown-item" href="#" id="culminarLiga" style="display:none;">Culminar la liga</a>
+                    </div>
+                </li>
+                <!-- Reportes Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="reportesDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Reportes
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="reportesDropdown">
+                        <a class="dropdown-item" href="#">Tabla de posiciones de la liga</a>
+                        <a class="dropdown-item" href="#">Partidos por equipos</a>
+                        <a class="dropdown-item" href="#">Partidos jugados por fecha</a>
+                        <a class="dropdown-item" href="#">Entrenadores con más experiencia</a>
+                        <a class="dropdown-item" href="#">Estadios con mayor audiencia</a>
+                        <a class="dropdown-item" href="#">Estado de un equipo</a>
+                        <a class="dropdown-item" href="#">Equipo todas estrellas</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <h1>Gestión de Futbolistas</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group" id="futbolista-list">
+                    <!-- Lista de futbolistas -->
+                </ul>
+            </div>
+            <div class="col-md-8">
+                <form>
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre">
+                        <div class="error-message" id="error-nombre">Nombre incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipo">Equipo</label>
+                        <select class="form-control" id="equipo"></select>
+                        <div class="error-message" id="error-equipo">Equipo incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="numero">Número</label>
+                        <input type="text" class="form-control" id="numero">
+                        <div class="error-message" id="error-numero">Número incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="añosEnEquipo">Años en el Equipo</label>
+                        <input type="text" class="form-control" id="añosEnEquipo">
+                        <div class="error-message" id="error-añosEnEquipo">Años incorrectos</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select class="form-control" id="tipo">
+                            <option value="Jugador">Jugador</option>
+                            <option value="Entrenador">Entrenador</option>
+                        </select>
+                        <div class="error-message" id="error-tipo">Tipo incorrecto</div>
+                    </div>
+                    <!-- Jugador Fields -->
+                    <div id="jugador-fields">
+                        <div class="form-group">
+                            <label for="partidosJugados">Partidos Jugados</label>
+                            <input type="text" class="form-control" id="partidosJugados">
+                            <div class="error-message" id="error-partidosJugados">Número incorrecto</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cantidadGoles">Cantidad de Goles</label>
+                            <input type="text" class="form-control" id="cantidadGoles">
+                            <div class="error-message" id="error-cantidadGoles">Número incorrecto</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="asistencias">Asistencias</label>
+                            <input type="text" class="form-control" id="asistencias">
+                            <div class="error-message" id="error-asistencias">Número incorrecto</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="promedioGoles">Promedio de Goles</label>
+                            <input type="text" class="form-control" id="promedioGoles" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="posicion">Posición</label>
+                            <select class="form-control" id="posicion">
+                                <option value="Defensa">Defensa</option>
+                                <option value="Delantero">Delantero</option>
+                                <option value="Mediocampista">Mediocampista</option>
+                                <option value="Portero">Portero</option>
+                            </select>
+                        </div>
+                        <!-- Defensa Fields -->
+                        <div id="defensa-fields" class="d-none">
+                            <div class="form-group">
+                                <label for="entradas">Entradas</label>
+                                <input type="text" class="form-control" id="entradas">
+                                <div class="error-message" id="error-entradas">Número incorrecto</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bloqueos">Bloqueos</label>
+                                <input type="text" class="form-control" id="bloqueos">
+                                <div class="error-message" id="error-bloqueos">Número incorrecto</div>
+                            </div>
+                        </div>
+                        <!-- Delantero Fields -->
+                        <div id="delantero-fields" class="d-none">
+                            <div class="form-group">
+                                <label for="tirosAPuerta">Tiros a Puerta</label>
+                                <input type="text" class="form-control" id="tirosAPuerta">
+                                <div class="error-message" id="error-tirosAPuerta">Número incorrecto</div>
+                            </div>
+                        </div>
+                        <!-- Mediocampista Fields -->
+                        <div id="mediocampista-fields" class="d-none">
+                            <div class="form-group">
+                                <label for="pasesCompletados">Pases Completados</label>
+                                <input type="text" class="form-control" id="pasesCompletados">
+                                <div class="error-message" id="error-pasesCompletados">Número incorrecto</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="intercepciones">Intercepciones</label>
+                                <input type="text" class="form-control" id="intercepciones">
+                                <div class="error-message" id="error-intercepciones">Número incorrecto</div>
+                            </div>
+                        </div>
+                        <!-- Portero Fields -->
+                        <div id="portero-fields" class="d-none">
+                            <div class="form-group">
+                                <label for="paradas">Paradas</label>
+                                <input type="text" class="form-control" id="paradas">
+                                <div class="error-message" id="error-paradas">Número incorrecto</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="golesEncajados">Goles Encajados</label>
+                                <input type="text" class="form-control" id="golesEncajados">
+                                <div class="error-message" id="error-golesEncajados">Número incorrecto</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Entrenador Fields -->
+                    <div id="entrenador-fields" class="d-none">
+                        <div class="form-group">
+                            <label for="experiencia">Años de Experiencia</label>
+                            <input type="text" class="form-control" id="experiencia">
+                            <div class="error-message" id="error-experiencia">Número incorrecto</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success" id="btn-agregar">Agregar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar">Guardar</button>
+                    <button type="button" class="btn btn-danger" id="btn-cancelar">Cancelar</button>
+                </form>
+                <button type="button" class="btn btn-warning mt-3" id="btn-eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Simulación de manejo de futbolistas
+        let futbolistas = [];
+        let equipos = ['Equipo 1', 'Equipo 2']; // ejemplo, debe ser llenado dinámicamente
+
+        function renderList() {
+            const list = document.getElementById('futbolista-list');
+            list.innerHTML = '';
+            futbolistas.forEach((futbolista, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.textContent = `${futbolista.nombre} - ${futbolista.equipo}`;
+                listItem.setAttribute('data-index', index);
+                list.appendChild(listItem);
+            });
+        }
+
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+        }
+
+        populateSelect('equipo', equipos);
+
+        document.getElementById('btn-agregar').addEventListener('click', function () {
+            const nombre = document.getElementById('nombre').value;
+            const equipo = document.getElementById('equipo').value;
+            const numero = document.getElementById('numero').value;
+            const añosEnEquipo = document.getElementById('añosEnEquipo').value;
+            const tipo = document.getElementById('tipo').value;
+
+            if (!nombre || !equipo || !numero || !añosEnEquipo || !tipo) {
+                if (!nombre) document.getElementById('error-nombre').style.display = 'block';
+                if (!equipo) document.getElementById('error-equipo').style.display = 'block';
+                if (!numero) document.getElementById('error-numero').style.display = 'block';
+                if (!añosEnEquipo) document.getElementById('error-añosEnEquipo').style.display = 'block';
+                if (!tipo) document.getElementById('error-tipo').style.display = 'block';
+                return;
+            }
+
+            const futbolista = { nombre, equipo, numero, añosEnEquipo, tipo };
+
+            if (tipo === 'Jugador') {
+                const partidosJugados = document.getElementById('partidosJugados').value;
+                const cantidadGoles = document.getElementById('cantidadGoles').value;
+                const asistencias = document.getElementById('asistencias').value;
+                const promedioGoles = (cantidadGoles / partidosJugados).toFixed(2);
+                const posicion = document.getElementById('posicion').value;
+
+                if (!partidosJugados || !cantidadGoles || !asistencias || !posicion) {
+                    if (!partidosJugados) document.getElementById('error-partidosJugados').style.display = 'block';
+                    if (!cantidadGoles) document.getElementById('error-cantidadGoles').style.display = 'block';
+                    if (!asistencias) document.getElementById('error-asistencias').style.display = 'block';
+                    if (!posicion) document.getElementById('error-posicion').style.display = 'block';
+                    return;
+                }
+
+                futbolista.partidosJugados = partidosJugados;
+                futbolista.cantidadGoles = cantidadGoles;
+                futbolista.asistencias = asistencias;
+                futbolista.promedioGoles = promedioGoles;
+                futbolista.posicion = posicion;
+
+                if (posicion === 'Defensa') {
+                    const entradas = document.getElementById('entradas').value;
+                    const bloqueos = document.getElementById('bloqueos').value;
+                    if (!entradas || !bloqueos) {
+                        if (!entradas) document.getElementById('error-entradas').style.display = 'block';
+                        if (!bloqueos) document.getElementById('error-bloqueos').style.display = 'block';
+                        return;
+                    }
+                    futbolista.entradas = entradas;
+                    futbolista.bloqueos = bloqueos;
+                } else if (posicion === 'Delantero') {
+                    const tirosAPuerta = document.getElementById('tirosAPuerta').value;
+                    if (!tirosAPuerta) {
+                        document.getElementById('error-tirosAPuerta').style.display = 'block';
+                        return;
+                    }
+                    futbolista.tirosAPuerta = tirosAPuerta;
+                } else if (posicion === 'Mediocampista') {
+                    const pasesCompletados = document.getElementById('pasesCompletados').value;
+                    const intercepciones = document.getElementById('intercepciones').value;
+                    if (!pasesCompletados || !intercepciones) {
+                        if (!pasesCompletados) document.getElementById('error-pasesCompletados').style.display = 'block';
+                        if (!intercepciones) document.getElementById('error-intercepciones').style.display = 'block';
+                        return;
+                    }
+                    futbolista.pasesCompletados = pasesCompletados;
+                    futbolista.intercepciones = intercepciones;
+                } else if (posicion === 'Portero') {
+                    const paradas = document.getElementById('paradas').value;
+                    const golesEncajados = document.getElementById('golesEncajados').value;
+                    if (!paradas || !golesEncajados) {
+                        if (!paradas) document.getElementById('error-paradas').style.display = 'block';
+                        if (!golesEncajados) document.getElementById('error-golesEncajados').style.display = 'block';
+                        return;
+                    }
+                    futbolista.paradas = paradas;
+                    futbolista.golesEncajados = golesEncajados;
+                }
+            } else if (tipo === 'Entrenador') {
+                const experiencia = document.getElementById('experiencia').value;
+                if (!experiencia) {
+                    document.getElementById('error-experiencia').style.display = 'block';
+                    return;
+                }
+                futbolista.experiencia = experiencia;
+            }
+
+            futbolistas.push(futbolista);
+            renderList();
+            document.getElementById('nombre').value = '';
+            document.getElementById('equipo').value = '';
+            document.getElementById('numero').value = '';
+            document.getElementById('añosEnEquipo').value = '';
+            document.getElementById('tipo').value = '';
+            document.getElementById('partidosJugados').value = '';
+            document.getElementById('cantidadGoles').value = '';
+            document.getElementById('asistencias').value = '';
+            document.getElementById('promedioGoles').value = '';
+            document.getElementById('posicion').value = '';
+            document.getElementById('entradas').value = '';
+            document.getElementById('bloqueos').value = '';
+            document.getElementById('tirosAPuerta').value = '';
+            document.getElementById('pasesCompletados').value = '';
+            document.getElementById('intercepciones').value = '';
+            document.getElementById('paradas').value = '';
+            document.getElementById('golesEncajados').value = '';
+            document.getElementById('error-nombre').style.display = 'none';
+            document.getElementById('error-equipo').style.display = 'none';
+            document.getElementById('error-numero').style.display = 'none';
+            document.getElementById('error-añosEnEquipo').style.display = 'none';
+            document.getElementById('error-tipo').style.display = 'none';
+            document.getElementById('error-partidosJugados').style.display = 'none';
+            document.getElementById('error-cantidadGoles').style.display = 'none';
+            document.getElementById('error-asistencias').style.display = 'none';
+            document.getElementById('error-entradas').style.display = 'none';
+            document.getElementById('error-bloqueos').style.display = 'none';
+            document.getElementById('error-tirosAPuerta').style.display = 'none';
+            document.getElementById('error-pasesCompletados').style.display = 'none';
+            document.getElementById('error-intercepciones').style.display = 'none';
+            document.getElementById('error-paradas').style.display = 'none';
+            document.getElementById('error-golesEncajados').style.display = 'none';
+        });
+
+        document.getElementById('btn-guardar').addEventListener('click', function() {
+            const selected = document.querySelector('.list-group-item.active');
+            if (selected) {
+                const index = selected.getAttribute('data-index');
+                futbolistas[index].nombre = document.getElementById('nombre').value;
+                futbolistas[index].equipo = document.getElementById('equipo').value;
+                futbolistas[index].numero = document.getElementById('numero').value;
+                futbolistas[index].añosEnEquipo = document.getElementById('añosEnEquipo').value;
+                futbolistas[index].tipo = document.getElementById('tipo').value;
+
+                if (futbolistas[index].tipo === 'Jugador') {
+                    futbolistas[index].partidosJugados = document.getElementById('partidosJugados').value;
+                    futbolistas[index].cantidadGoles = document.getElementById('cantidadGoles').value;
+                    futbolistas[index].asistencias = document.getElementById('asistencias').value;
+                    futbolistas[index].promedioGoles = (futbolistas[index].cantidadGoles / futbolistas[index].partidosJugados).toFixed(2);
+                    futbolistas[index].posicion = document.getElementById('posicion').value;
+
+                    if (futbolistas[index].posicion === 'Defensa') {
+                        futbolistas[index].entradas = document.getElementById('entradas').value;
+                        futbolistas[index].bloqueos = document.getElementById('bloqueos').value;
+                    } else if (futbolistas[index].posicion === 'Delantero') {
+                        futbolistas[index].tirosAPuerta = document.getElementById('tirosAPuerta').value;
+                    } else if (futbolistas[index].posicion === 'Mediocampista') {
+                        futbolistas[index].pasesCompletados = document.getElementById('pasesCompletados').value;
+                        futbolistas[index].intercepciones = document.getElementById('intercepciones').value;
+                    } else if (futbolistas[index].posicion === 'Portero') {
+                        futbolistas[index].paradas = document.getElementById('paradas').value;
+                        futbolistas[index].golesEncajados = document.getElementById('golesEncajados').value;
+                    }
+                } else if (futbolistas[index].tipo === 'Entrenador') {
+                    futbolistas[index].experiencia = document.getElementById('experiencia').value;
+                }
+
+                renderList();
+            }
+        });
+
+        document.getElementById('btn-cancelar').addEventListener('click', function() {
+            document.getElementById('nombre').value = '';
+            document.getElementById('equipo').value = '';
+            document.getElementById('numero').value = '';
+            document.getElementById('añosEnEquipo').value = '';
+            document.getElementById('tipo').value = '';
+            document.getElementById('partidosJugados').value = '';
+            document.getElementById('cantidadGoles').value = '';
+            document.getElementById('asistencias').value = '';
+            document.getElementById('promedioGoles').value = '';
+            document.getElementById('posicion').value = '';
+            document.getElementById('entradas').value = '';
+            document.getElementById('bloqueos').value = '';
+            document.getElementById('tirosAPuerta').value = '';
+            document.getElementById('pasesCompletados').value = '';
+            document.getElementById('intercepciones').value = '';
+            document.getElementById('paradas').value = '';
+            document.getElementById('golesEncajados').value = '';
+            document.getElementById('error-nombre').style.display = 'none';
+            document.getElementById('error-equipo').style.display = 'none';
+            document.getElementById('error-numero').style.display = 'none';
+            document.getElementById('error-añosEnEquipo').style.display = 'none';
+            document.getElementById('error-tipo').style.display = 'none';
+            document.getElementById('error-partidosJugados').style.display = 'none';
+            document.getElementById('error-cantidadGoles').style.display = 'none';
+            document.getElementById('error-asistencias').style.display = 'none';
+            document.getElementById('error-entradas').style.display = 'none';
+            document.getElementById('error-bloqueos').style.display = 'none';
+            document.getElementById('error-tirosAPuerta').style.display = 'none';
+            document.getElementById('error-pasesCompletados').style.display = 'none';
+            document.getElementById('error-intercepciones').style.display = 'none';
+            document.getElementById('error-paradas').style.display = 'none';
+            document.getElementById('error-golesEncajados').style.display = 'none';
+        });
+
+        document.getElementById('btn-eliminar').addEventListener('click', function() {
+            const selected = document.querySelector('.list-group-item.active');
+            if (selected) {
+                const index = selected.getAttribute('data-index');
+                futbolistas.splice(index, 1);
+                renderList();
+            }
+        });
+
+        document.getElementById('futbolista-list').addEventListener('click', function(e) {
+            if (e.target && e.target.matches('li.list-group-item')) {
+                const items = document.querySelectorAll('.list-group-item');
+                items.forEach(item => item.classList.remove('active'));
+                e.target.classList.add('active');
+                const index = e.target.getAttribute('data-index');
+                document.getElementById('nombre').value = futbolistas[index].nombre;
+                document.getElementById('equipo').value = futbolistas[index].equipo;
+                document.getElementById('numero').value = futbolistas[index].numero;
+                document.getElementById('añosEnEquipo').value = futbolistas[index].añosEnEquipo;
+                document.getElementById('tipo').value = futbolistas[index].tipo;
+
+                if (futbolistas[index].tipo === 'Jugador') {
+                    document.getElementById('partidosJugados').value = futbolistas[index].partidosJugados;
+                    document.getElementById('cantidadGoles').value = futbolistas[index].cantidadGoles;
+                    document.getElementById('asistencias').value = futbolistas[index].asistencias;
+                    document.getElementById('promedioGoles').value = futbolistas[index].promedioGoles;
+                    document.getElementById('posicion').value = futbolistas[index].posicion;
+
+                    if (futbolistas[index].posicion === 'Defensa') {
+                        document.getElementById('entradas').value = futbolistas[index].entradas;
+                        document.getElementById('bloqueos').value = futbolistas[index].bloqueos;
+                    } else if (futbolistas[index].posicion === 'Delantero') {
+                        document.getElementById('tirosAPuerta').value = futbolistas[index].tirosAPuerta;
+                    } else if (futbolistas[index].posicion === 'Mediocampista') {
+                        document.getElementById('pasesCompletados').value = futbolistas[index].pasesCompletados;
+                        document.getElementById('intercepciones').value = futbolistas[index].intercepciones;
+                    } else if (futbolistas[index].posicion === 'Portero') {
+                        document.getElementById('paradas').value = futbolistas[index].paradas;
+                        document.getElementById('golesEncajados').value = futbolistas[index].golesEncajados;
+                    }
+                }
+                else if (futbolistas[index].tipo === 'Entrenador') {
+                    document.getElementById('experiencia').value = futbolistas[index].experiencia;
+                }
+            }
+        });
+
+        renderList();
+    </script>
+</body>
+</html>

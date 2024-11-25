@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Partidos</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .main-container {
+            margin-top: 50px;
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="principal.html">Liga Nacional de Fútbol</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <!-- Perfil Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Perfil
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="perfilDropdown">
+                        <a class="dropdown-item" href="#" id="iniciarSesion">Iniciar sesión</a>
+                        <a class="dropdown-item" href="#" id="cerrarSesion" style="display:none;">Cerrar sesión</a>
+                        <a class="dropdown-item" href="#">Gestión de usuarios</a>
+                    </div>
+                </li>
+                <!-- Gestión de la Liga Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="gestionLigaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Gestión de la liga
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="gestionLigaDropdown">
+                        <a class="dropdown-item" href="crudEstadio.html">Estadios</a>
+                        <a class="dropdown-item" href="crudEquipo.html">Equipos</a>
+                        <a class="dropdown-item" href="crudPartido.html">Partidos</a>
+                        <a class="dropdown-item" href="#">Futbolistas</a>
+                        <a class="dropdown-item" href="#" id="iniciarLiga" style="display:none;">Comenzar la liga</a>
+                        <a class="dropdown-item" href="#" id="culminarLiga" style="display:none;">Culminar la liga</a>
+                    </div>
+                </li>
+                <!-- Reportes Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="reportesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Reportes
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="reportesDropdown">
+                        <a class="dropdown-item" href="#">Tabla de posiciones de la liga</a>
+                        <a class="dropdown-item" href="#">Partidos por equipos</a>
+                        <a class="dropdown-item" href="#">Partidos jugados por fecha</a>
+                        <a class="dropdown-item" href="#">Entrenadores con más experiencia</a>
+                        <a class="dropdown-item" href="#">Estadios con mayor audiencia</a>
+                        <a class="dropdown-item" href="#">Estado de un equipo</a>
+                        <a class="dropdown-item" href="#">Equipo todas estrellas</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <h1>Gestión de Partidos</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group" id="partido-list">
+                    <!-- Lista de partidos -->
+                </ul>
+            </div>
+            <div class="col-md-8">
+                <form>
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="datetime-local" class="form-control" id="fecha">
+                        <div class="error-message" id="error-fecha">Fecha incorrecta</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="estadio">Estadio</label>
+                        <select class="form-control" id="estadio"></select>
+                        <div class="error-message" id="error-estadio">Estadio incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="audiencia">Audiencia</label>
+                        <input type="text" class="form-control" id="audiencia">
+                        <div class="error-message" id="error-audiencia">Audiencia incorrecta</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="local">Equipo Local</label>
+                        <select class="form-control" id="local"></select>
+                        <div class="error-message" id="error-local">Equipo local incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="visitante">Equipo Visitante</label>
+                        <select class="form-control" id="visitante"></select>
+                        <div class="error-message" id="error-visitante">Equipo visitante incorrecto</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="golesLocal">Goles del Equipo Local</label>
+                        <input type="text" class="form-control" id="golesLocal">
+                        <div class="error-message" id="error-golesLocal">Goles incorrectos</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="golesVisitante">Goles del Equipo Visitante</label>
+                        <input type="text" class="form-control" id="golesVisitante">
+                        <div class="error-message" id="error-golesVisitante">Goles incorrectos</div>
+                    </div>
+                    <button type="button" class="btn btn-success" id="btn-agregar">Agregar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar">Guardar</button>
+                    <button type="button" class="btn btn-danger" id="btn-cancelar">Cancelar</button>
+                </form>
+                <button type="button" class="btn btn-warning mt-3" id="btn-eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Simulación de manejo de partidos
+        let partidos = [];
+        let estadios = ['Estadio 1', 'Estadio 2']; // ejemplo, debe ser llenado dinámicamente
+        let equipos = ['Equipo 1', 'Equipo 2']; // ejemplo, debe ser llenado dinámicamente
+
+        function renderList() {
+            const list = document.getElementById('partido-list');
+            list.innerHTML = '';
+            partidos.forEach((partido, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.textContent = `${partido.fecha} - ${partido.local} vs ${partido.visitante}`;
+                listItem.setAttribute('data-index', index);
+                list.appendChild(listItem);
+            });
+        }
+
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+        }
+
+        populateSelect('estadio', estadios);
+        populateSelect('local', equipos);
+        populateSelect('visitante', equipos);
+
+        document.getElementById('btn-agregar').addEventListener('click', function() {
+            const fecha = document.getElementById('fecha').value;
+            const estadio = document.getElementById('estadio').value;
+            const audiencia = document.getElementById('audiencia').value;
+            const local = document.getElementById('local').value;
+            const visitante = document.getElementById('visitante').value;
+            const golesLocal = document.getElementById('golesLocal').value;
+            const golesVisitante = document.getElementById('golesVisitante').value;
+
+            if (!fecha || !estadio || !audiencia || !local || !visitante || !golesLocal || !golesVisitante || local === visitante) {
+                if (!fecha) document.getElementById('error-fecha').style.display = 'block';
+                if (!estadio) document.getElementById('error-estadio').style.display = 'block';
+                if (!audiencia) document.getElementById('error-audiencia').style.display = 'block';
+                if (!local) document.getElementById('error-local').style.display = 'block';
+                if (!visitante) document.getElementById('error-visitante').style.display = 'block';
+                if (!golesLocal) document.getElementById('error-golesLocal').style.display = 'block';
+                if (!golesVisitante) document.getElementById('error-golesVisitante').style.display = 'block';
+                if (local === visitante) alert('El equipo local y el visitante no pueden ser el mismo.');
+                return;
+            }
+
+            partidos.push({ fecha, estadio, audiencia, local, visitante, golesLocal, golesVisitante });
+            renderList();
+            document.getElementById('fecha').value = '';
+            document.getElementById('estadio').value = '';
+            document.getElementById('audiencia').value = '';
+            document.getElementById('local').value = '';
+            document.getElementById('visitante').value = '';
+            document.getElementById('golesLocal').value = '';
+            document.getElementById('golesVisitante').value = '';
+            document.getElementById('error-fecha').style.display = 'none';
+            document.getElementById('error-estadio').style.display = 'none';
+            document.getElementById('error-audiencia').style.display = 'none';
+            document.getElementById('error-local').style.display = 'none';
+            document.getElementById('error-visitante').style.display = 'none';
+            document.getElementById('error-golesLocal').style.display = 'none';
+            document.getElementById('error-golesVisitante').style.display = 'none';
+        });
+
+        document.getElementById('btn-guardar').addEventListener('click', function() {
+            const selected = document.querySelector('.list-group-item.active');
+            if (selected) {
+                const index = selected.getAttribute('data-index');
+                partidos[index].fecha = document.getElementById('fecha').value;
+                partidos[index].estadio = document.getElementById('estadio').value;
+                partidos[index].audiencia = document.getElementById('audiencia').value;
+                partidos[index].local = document.getElementById('local').value;
+                partidos[index].visitante = document.getElementById('visitante').value;
+                partidos[index].golesLocal = document.getElementById('golesLocal').value;
+                partidos[index].golesVisitante = document.getElementById('golesVisitante').value;
+                renderList();
+            }
+        });
+
+        document.getElementById('btn-cancelar').addEventListener('click', function() {
+            document.getElementById('fecha').value = '';
+            document.getElementById('estadio').value = '';
+            document.getElementById('audiencia').value = '';
+            document.getElementById('local').value = '';
+            document.getElementById('visitante').value = '';
+            document.getElementById('golesLocal').value = '';
+            document.getElementById('golesVisitante').value = '';
+            document.getElementById('error-fecha').style.display = 'none';
+            document.getElementById('error-estadio').style.display = 'none';
+            document.getElementById('error-audiencia').style.display = 'none';
+            document.getElementById('error-local').style.display = 'none';
+            document.getElementById('error-visitante').style.display = 'none';
+            document.getElementById('error-golesLocal').style.display = 'none';
+            document.getElementById('error-golesVisitante').style.display = 'none';
+        });
+
+        document.getElementById('btn-eliminar').addEventListener('click', function() {
+            const selected = document.querySelector('.list-group-item.active');
+            if (selected) {
+                const index = selected.getAttribute('data-index');
+                partidos.splice(index, 1);
+                renderList();
+            }
+        });
+
+        document.getElementById('partido-list').addEventListener('click', function(e) {
+            if (e.target && e.target.matches('li.list-group-item')) {
+                const items = document.querySelectorAll('.list-group-item');
+                items.forEach(item => item.classList.remove('active'));
+                e.target.classList.add('active');
+                const index = e.target.getAttribute('data-index');
+                document.getElementById('fecha').value = partidos[index].fecha;
+                document.getElementById('estadio').value = partidos[index].estadio;
+                document.getElementById('audiencia').value = partidos[index].audiencia;
+                document.getElementById('local').value = partidos[index].local;
+                document.getElementById('visitante').value = partidos[index].visitante;
+                document.getElementById('golesLocal').value = partidos[index].golesLocal;
+                document.getElementById('golesVisitante').value = partidos[index].golesVisitante;
+            }
+        });
+
+        renderList();
+    </script>
+</body>
+</html>

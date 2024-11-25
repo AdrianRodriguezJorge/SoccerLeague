@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de un Equipo</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        .main-container {
+            margin-top: 50px;
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+        .report-table th, .report-table td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="container main-container">
+        <h1>Estado de un Equipo</h1>
+        <div class="row">
+            <div class="col-md-12">
+                <p>Seleccione el equipo para ver su estado:</p>
+                <select class="form-control" id="equipo"></select>
+                <button type="button" class="btn btn-success mt-3" id="btn-generar-reporte">Generar Reporte</button>
+                <button type="button" class="btn btn-primary mt-3" id="btn-imprimir-reporte">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+                <table class="table table-bordered table-striped report-table mt-3">
+                    <thead>
+                        <tr>
+                            <th>Resultado</th>
+                            <th>Total</th>
+                            <th>Como Local</th>
+                            <th>Como Visitante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ganados</td>
+                            <td id="total-ganados">0</td>
+                            <td id="local-ganados">0</td>
+                            <td id="visitante-ganados">0</td>
+                        </tr>
+                        <tr>
+                            <td>Empatados</td>
+                            <td id="total-empatados">0</td>
+                            <td id="local-empatados">0</td>
+                            <td id="visitante-empatados">0</td>
+                        </tr>
+                        <tr>
+                            <td>Perdidos</td>
+                            <td id="total-perdidos">0</td>
+                            <td id="local-perdidos">0</td>
+                            <td id="visitante-perdidos">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        // Simulación de manejo de equipos
+        let equipos = ['Equipo 1', 'Equipo 2']; // ejemplo, debe ser llenado dinámicamente
+
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+        }
+
+        populateSelect('equipo', equipos);
+
+        document.getElementById('btn-generar-reporte').addEventListener('click', function() {
+            const selectedIndex = document.getElementById('equipo').selectedIndex;
+            // Ejemplo de datos, debe ser reemplazado con una llamada a la API o servicio
+            const reporte = {
+                totalGanados: 10,
+                localGanados: 6,
+                visitanteGanados: 4,
+                totalEmpatados: 5,
+                localEmpatados: 3,
+                visitanteEmpatados: 2,
+                totalPerdidos: 3,
+                localPerdidos: 1,
+                visitantePerdidos: 2
+            };
+            // Actualizar tabla con datos del reporte
+            document.getElementById('total-ganados').textContent = reporte.totalGanados;
+            document.getElementById('local-ganados').textContent = reporte.localGanados;
+            document.getElementById('visitante-ganados').textContent = reporte.visitanteGanados;
+            document.getElementById('total-empatados').textContent = reporte.totalEmpatados;
+            document.getElementById('local-empatados').textContent = reporte.localEmpatados;
+            document.getElementById('visitante-empatados').textContent = reporte.visitanteEmpatados;
+            document.getElementById('total-perdidos').textContent = reporte.totalPerdidos;
+            document.getElementById('local-perdidos').textContent = reporte.localPerdidos;
+            document.getElementById('visitante-perdidos').textContent = reporte.visitantePerdidos;
+        });
+
+        document.getElementById('btn-imprimir-reporte').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("Reporte de Estado de un Equipo", 10, 10);
+            doc.autoTable({ html: '.report-table' });
+
+            doc.save('reporte_estado_equipo.pdf');
+        });
+    </script>
+</body>
+</html>
