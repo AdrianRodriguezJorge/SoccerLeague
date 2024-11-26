@@ -7,11 +7,40 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #f8f9fa;
+        }
         .main-container {
             margin-top: 50px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .report-table th, .report-table td {
+        .main-container h1 {
+            font-size: 2rem;
             text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .report-table th {
+            background-color: #134b87;
+            color: white;
+        }
+        .report-table td {
+            text-align: center;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-custom:hover {
+            background: #5a6268;
         }
     </style>
 </head>
@@ -19,9 +48,14 @@
     <!-- Main Content -->
     <div class="container main-container">
         <h1>Entrenadores con más experiencia</h1>
-        <button type="button" class="btn btn-primary" id="btn-imprimir-reporte">
-            <i class="fas fa-print"></i> Imprimir
-        </button>
+        <div class="action-buttons">
+            <button type="button" class="btn btn-primary" id="btn-imprimir-reporte">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <button type="button" class="btn btn-custom" onclick="irPaginaPrincipal()">
+                <i class="fas fa-home"></i> Página Principal
+            </button>
+        </div>
         <table class="table table-bordered table-striped report-table mt-3">
             <thead>
                 <tr>
@@ -33,7 +67,7 @@
                 </tr>
             </thead>
             <tbody id="reporte-tabla">
-                <!-- Aquí se llenará con los datos del reporte -->
+                <!-- Datos cargados dinámicamente -->
             </tbody>
         </table>
     </div>
@@ -46,11 +80,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        // Ejemplo de datos, debe ser reemplazado con una llamada a la API o servicio
+        // Ejemplo de datos
         const reporte = [
             { nombre: 'Entrenador 1', numero: 1, experiencia: 20, equipo: 'Equipo 1', campeonatos: 5 },
             { nombre: 'Entrenador 2', numero: 2, experiencia: 15, equipo: 'Equipo 2', campeonatos: 3 },
-            // agregar más datos de ejemplo según sea necesario
         ];
 
         const tablaCuerpo = document.getElementById('reporte-tabla');
@@ -68,6 +101,7 @@
             tablaCuerpo.appendChild(fila);
         });
 
+        // Función para exportar a pdf
         document.getElementById('btn-imprimir-reporte').addEventListener('click', function() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -77,6 +111,11 @@
 
             doc.save('entrenadores_mas_experiencia.pdf');
         });
+
+        // Función para regresar a la página principal
+        function irPaginaPrincipal() {
+            window.location.href = './principal.html'; 
+        }
     </script>
 </body>
 </html>
