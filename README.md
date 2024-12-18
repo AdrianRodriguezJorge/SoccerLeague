@@ -1,4 +1,4 @@
-### Proyecto de Gestión de la Liga Nacional de Fútbol
+## Proyecto de Gestión de la Liga Nacional de Fútbol
 
 Este proyecto es una aplicación web para gestionar y visualizar información sobre la Liga Nacional de Fútbol. La aplicación permite a los usuarios iniciar sesión, gestionar la liga, ver reportes y mucho más.
 
