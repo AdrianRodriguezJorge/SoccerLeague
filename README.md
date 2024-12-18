@@ -1,4 +1,6 @@
-# Proyecto de Gestión de la Liga Nacional de Fútbol
+Gracias por la imagen del directorio del proyecto. Ahora tenemos una visión más clara de cómo está organizado el proyecto. Aquí tienes el README actualizado teniendo en cuenta la estructura del proyecto que has compartido:
+
+### Proyecto de Gestión de la Liga Nacional de Fútbol
 
 Este proyecto es una aplicación web para gestionar y visualizar información sobre la Liga Nacional de Fútbol. La aplicación permite a los usuarios iniciar sesión, gestionar la liga, ver reportes y mucho más.
 
@@ -20,7 +22,7 @@ Este proyecto es una aplicación web para gestionar y visualizar información so
 
 1. **Clonar el repositorio**:
     ```bash
-    git clone https://github.com/tu-usuario/nombre-del-proyecto.git
+    git clone https://github.com/AdrianRodriguezJorge/SoccerLeague.git
     cd nombre-del-proyecto
     ```
 
@@ -39,15 +41,32 @@ Este proyecto es una aplicación web para gestionar y visualizar información so
 ```
 ├── src
 │   ├── assets
+│   ├── common
+│   │   ├── Navbar.vue
+│   │   ├── Button.vue
+│   │   ├── Table.vue
 │   ├── components
 │   │   ├── Login.vue
-│   │   ├── Navbar.vue
 │   │   ├── Principal.vue
 │   │   ├── CrudEstadio.vue
+│   │   ├── CrudEquipo.vue
 │   │   ├── CrudPartido.vue
+│   │   ├── CrudFutbolista.vue
 │   ├── router
 │   │   └── index.js
-│   ├── store
+│   ├── stores
+│   │   ├── equipoStore.js
+│   │   ├── estadioStore.js
+│   │   ├── partidoStore.js
+│   │   ├── futbolistaStore.js
+│   ├── views
+│   │   ├── Reportes
+│   │   │   ├── EstadoEquipo.vue
+│   │   │   ├── PartidosPorEquipos.vue
+│   │   │   ├── PartidosPorFecha.vue
+│   │   │   ├── EntrenadoresExp.vue
+│   │   │   ├── EstadiosMayorAudiencia.vue
+│   │   │   ├── TablaPosiciones.vue
 │   ├── App.vue
 │   ├── main.js
 ├── public
@@ -57,7 +76,7 @@ Este proyecto es una aplicación web para gestionar y visualizar información so
 
 ## Uso
 
-1. **Inicio de Sesión**: Ingresa tus credenciales de usuario en el formulario de inicio de sesión. 
+1. **Inicio de Sesión**: Ingresa tus credenciales de usuario en el formulario de inicio de sesión.
 2. **Navegación**: Usa la barra de navegación para acceder a diferentes secciones de la aplicación.
 3. **Gestión de la Liga**: Accede a las funcionalidades para gestionar estadios, equipos, partidos y futbolistas.
 4. **Reportes**: Visualiza diferentes reportes sobre la liga desde el menú de reportes.
