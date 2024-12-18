@@ -8,10 +8,34 @@
 </template>
 
 <script>
-import Navbar from '../components/Navbar.vue';
+import { ref, onMounted } from 'vue';
+import Navbar from '../common/Navbar.vue';
 
 export default {
-  components: { Navbar }
+  components: { Navbar },
+  setup() {
+    const usuarioActual = ref('admin');
+
+    const actualizarEstadoUsuario = () => {
+      if (usuarioActual.value) {
+        document.getElementById('usuarioActual').textContent = `Usuario: ${usuarioActual.value}`;
+        document.getElementById('iniciarSesion').style.display = 'none';
+        document.getElementById('cerrarSesion').style.display = 'block';
+      } else {
+        document.getElementById('usuarioActual').textContent = '';
+        document.getElementById('iniciarSesion').style.display = 'block';
+        document.getElementById('cerrarSesion').style.display = 'none';
+      }
+    };
+
+    onMounted(() => {
+      actualizarEstadoUsuario();
+    });
+
+    return {
+      usuarioActual
+    };
+  },
 };
 </script>
 

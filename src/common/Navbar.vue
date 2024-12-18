@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/principal">Liga Nacional de Fútbol</a>
+      <router-link class="navbar-brand" to="/principal">Liga Nacional de Fútbol</router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -32,6 +32,7 @@
                 :key="subIndex"
                 :to="subItem.to"
                 class="dropdown-item"
+                @click.native="handleMenuItemClick(subItem.name)"
               >
                 {{ subItem.name }}
               </router-link>
@@ -61,8 +62,8 @@ export default {
           id: 'perfilDropdown',
           subItems: [
             { to: '/login', name: 'Iniciar sesión' },
-            { to: '#', name: 'Cerrar sesión' },
-            { to: '/crud-usuarios', name: 'Gestión de usuarios' }
+            { to: '/principal', name: 'Cerrar sesión' },
+            { to: '/crud-usuario', name: 'Gestión de usuarios' }
           ]
         },
         {
@@ -73,8 +74,8 @@ export default {
             { to: '/crud-equipo', name: 'Equipos' },
             { to: '/crud-partido', name: 'Partidos' },
             { to: '/crud-futbolista', name: 'Futbolistas' },
-            { to: '#', name: 'Comenzar la liga' },
-            { to: '#', name: 'Culminar la liga' }
+            { to: '#', name: 'Comenzar la liga', action: 'iniciarLiga' },
+            { to: '#', name: 'Culminar la liga', action: 'culminarLiga' }
           ]
         },
         {
@@ -87,7 +88,6 @@ export default {
             { to: '/entrenadores-exp', name: 'Entrenadores con más experiencia' },
             { to: '/estadios-mayor-audiencia', name: 'Estadios con mayor audiencia' },
             { to: '/estado-equipo', name: 'Estado de un equipo' },
-            { to: '/all-stars', name: 'Equipo todas estrellas' }
           ]
         }
       ],
@@ -96,14 +96,23 @@ export default {
   },
   mounted() {
     this.actualizarEstadoUsuario();
-    this.actualizarEstadoLiga();
   },
   methods: {
     actualizarEstadoUsuario() {
       this.usuarioActual = "admin";
     },
-    actualizarEstadoLiga() {
-      // Aquí puedes agregar la lógica para actualizar el estado de la liga
+    handleMenuItemClick(action) {
+      if (action === 'Cerrar sesión') {
+        this.cerrarSesion();
+      } else if (action === 'iniciarLiga') {
+        this.$emit('iniciarLiga');
+      } else if (action === 'culminarLiga') {
+        this.$emit('culminarLiga');
+      }
+    },
+    cerrarSesion() {
+      this.usuarioActual = null;
+      this.$router.push('/principal');
     }
   }
 };
