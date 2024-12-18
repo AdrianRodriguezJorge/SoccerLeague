@@ -148,4 +148,8 @@ export default {
 .table tr.selected {
   background-color: #d3d3d3;
 }
+
+.btn {
+  margin-bottom: 10px;
+}
 </style>

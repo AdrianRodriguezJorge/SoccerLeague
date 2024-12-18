@@ -32,7 +32,6 @@
                 :key="subIndex"
                 :to="subItem.to"
                 class="dropdown-item"
-                @click.native="handleMenuItemClick(subItem.name)"
               >
                 {{ subItem.name }}
               </router-link>
@@ -61,7 +60,7 @@ export default {
           name: 'Perfil',
           id: 'perfilDropdown',
           subItems: [
-            { to: '/login', name: 'Iniciar sesión' },
+            { to: '/', name: 'Iniciar sesión' },
             { to: '/principal', name: 'Cerrar sesión' },
             { to: '/crud-usuario', name: 'Gestión de usuarios' }
           ]
