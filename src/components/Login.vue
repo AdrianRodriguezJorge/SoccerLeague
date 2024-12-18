@@ -31,6 +31,7 @@
           </div>
           <div class="d-flex justify-content-center mt-3">
             <button class="btn btn-link" @click="forgotPassword">Olvidó su contraseña?</button>
+            <button class="btn btn-link" @click="forgotPassword">Cambiar contraseña</button>
           </div>
           <div v-if="errorMessage" class="alert alert-danger mt-3" role="alert">
             {{ errorMessage }}

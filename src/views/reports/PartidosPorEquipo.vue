@@ -1,87 +1,92 @@
 <template>
+  <div>
+    <Navbar />
     <div class="container main-container">
       <h1>Partidos por Equipos</h1>
       <div class="row">
         <div class="col-md-12">
           <p>Seleccione dos Equipos:</p>
-          <Dropdown
-            :items="equipos"
-            v-model="equipo1"
-            id="equipo1"
-          />
-          <Dropdown
-            :items="equipos"
-            v-model="equipo2"
-            id="equipo2"
-          />
-          <Button
-            btnClass="btn-success mt-3"
-            :onClick="generarReporte"
-          >
-            Generar Reporte
-          </Button>
-          <Button
-            btnClass="btn-primary mt-3"
-            :onClick="imprimirReporte"
-          >
-            <i class="fas fa-print"></i> Imprimir
-          </Button>
-          <Button
-            btnClass="btn- btn-right mt-3"
-            :onClick="irPaginaPrincipal"
-          >
-            <i class="fas fa-home"></i> Página Principal
-          </Button>
-          <Table :data="reporte" />
+          <label for="equipo1">Equipo 1:</label>
+          <Dropdown :items="equipos" v-model="equipo1" id="equipo1" />
+          <label for="equipo2">Equipo 2:</label>
+          <Dropdown :items="equipos" v-model="equipo2" id="equipo2" />
+          <Button text="Generar Reporte" type="success" @click="generarReporte" class="mt-3" />
+          <Button text="Imprimir" :icon="'fas fa-print'" type="primary" @click="imprimirReporte" class="mt-3" />
+          <Table :headers="tableHeaders" :rows="reporte" class="mt-3" />
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
-  <script>
-  import Button from '../../common/Button.vue';
-  import Dropdown from '../../common/Dropdown.vue';
-  import Table from '../../common/Table.vue';
+<script>
+import { ref } from 'vue';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { usePartidoStore } from '../../stores/partidoStore';
+import { useEquipoStore } from '../../stores/equipoStore';
+import Navbar from '../../common/Navbar.vue';
+import Button from '../../common/Button.vue';
+import Dropdown from '../../common/Dropdown.vue';
+import Table from '../../common/Table.vue';
 
-  export default {
-    name: "PartidosPorEquipo",
-    components: { Dropdown, Button, Table },
-    data() {
-      return {
-        equipos: ["Equipo 1", "Equipo 2"],
-        equipo1: null,
-        equipo2: null,
-        reporte: [],
-      };
-    },
-    methods: {
-      generarReporte() {
-        if (this.equipo1 === this.equipo2) {
-          alert("Debe seleccionar 2 equipos diferentes.");
-          return;
-        }
+export default {
+  name: "PartidosPorEquipo",
+  components: { Navbar, Dropdown, Button, Table },
+  setup() {
+    const equipoStore = useEquipoStore();
+    const partidoStore = usePartidoStore();
+    const equipos = equipoStore.equipos.map(equipo => equipo.nombre);
+    const equipo1 = ref(null);
+    const equipo2 = ref(null);
+    const tableHeaders = ["Fecha", "Local", "Visitante", "Resultado"];
+    const reporte = ref([]);
 
-        this.reporte = [
-          { fecha: "2024-01-01", local: this.equipo1, visitante: this.equipo2, resultado: "2-1" },
-          { fecha: "2024-02-01", local: this.equipo2, visitante: this.equipo1, resultado: "1-1" },
-        ];
-      },
-      imprimirReporte() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Reporte de Partidos por Equipos", 10, 10);
-        doc.autoTable({ html: ".report-table" });
-        doc.save("reporte_partidos_por_equipos.pdf");
-      },
-      irPaginaPrincipal() {
-        window.location.href = "./principal.html";
-      },
-    },
-  };
-  </script>
+    const generarReporte = () => {
+      if (equipo1.value === equipo2.value) {
+        alert("Debe seleccionar 2 equipos diferentes.");
+        return;
+      }
 
-  <style scoped>
-  .main-container {
-    margin-top: 20px;
-  }
-  </style>
+      reporte.value = partidoStore.partidos.filter(partido =>
+        (partido.local === equipo1.value && partido.visitante === equipo2.value) ||
+        (partido.local === equipo2.value && partido.visitante === equipo1.value)
+      ).map(partido => ({
+        fecha: partido.fecha,
+        local: partido.local,
+        visitante: partido.visitante,
+        resultado: partido.resultado
+      }));
+    };
+
+    const imprimirReporte = () => {
+      const doc = new jsPDF();
+      doc.text("Reporte de Partidos por Equipos", 10, 10);
+      doc.autoTable({
+        head: [tableHeaders],
+        body: reporte.value.map(partido => Object.values(partido)),
+      });
+      doc.save("reporte_partidos_por_equipos.pdf");
+    };
+
+    return {
+      equipos,
+      equipo1,
+      equipo2,
+      tableHeaders,
+      reporte,
+      generarReporte,
+      imprimirReporte,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.main-container {
+  margin-top: 20px;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+</style>

@@ -14,8 +14,7 @@ import PartidosPorFecha from '../views/reports/PartidosPorFecha.vue';
 import TablaDePosiciones from '../views/reports/TablaDePosiciones.vue';
 
 const routes = [
-  { path: '/', component: Principal }, // cambiar !!!!!!!!!!!!!
-  { path: '/login', component: Login },
+  { path: '/', component: Login },
   { path: '/principal', component: Principal },
   { path: '/crud-estadio', component: CrudEstadio },
   { path: '/crud-partido', component: CrudPartido },

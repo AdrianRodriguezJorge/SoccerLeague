@@ -1,4 +1,6 @@
 <template>
+  <div>
+    <Navbar />
     <div class="container main-container">
       <h1>Estadios con mayor audiencia</h1>
       <div class="action-buttons">
@@ -8,54 +10,57 @@
           type="primary"
           @click="imprimirReporte"
         />
-        <Button
-          :icon="'fas fa-home'"
-          text="Página Principal"
-          type=""
-          @click="irPaginaPrincipal"
-        />
       </div>
       <Table :headers="tableHeaders" :rows="reporte" />
     </div>
-  </template>
+  </div>
+</template>
 
-  <script>
-  import { jsPDF } from "jspdf";
-  import "jspdf-autotable";
-  import Button from '../../common/Button.vue';
-  import Table from '../../common/Table.vue';
+<script>
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { useEstadioStore } from '../../stores/estadioStore';
+import Navbar from '../../common/Navbar.vue';
+import Button from '../../common/Button.vue';
+import Table from '../../common/Table.vue';
 
-  export default {
-    name: "EstadiosMayorAudiencia",
-    components: {
-      Button,
-      Table,
-    },
-    data() {
-      return {
-        reporte: [
-          { estadio: "Estadio 1", audiencia: 85 },
-          { estadio: "Estadio 2", audiencia: 75 },
-        ],
-        tableHeaders: ["Estadio", "Porcentaje de audiencia (%)"],
-      };
-    },
-    methods: {
-      imprimirReporte() {
-        const doc = new jsPDF();
-        doc.text("Estadios con mayor audiencia", 10, 10);
-        doc.autoTable({ html: ".report-table" });
-        doc.save("estadios_mayor_audiencia.pdf");
-      },
-      irPaginaPrincipal() {
-        window.location.href = "./principal.html";
-      },
-    },
-  };
-  </script>
+export default {
+  name: "EstadiosMayorAudiencia",
+  components: {
+    Navbar,
+    Button,
+    Table,
+  },
+  setup() {
+    const estadioStore = useEstadioStore();
+    const reporte = estadioStore.estadios.map(estadio => ({
+      estadio: estadio.nombre,
+      audiencia: estadio.audiencia
+    }));
 
-  <style scoped>
-  .action-buttons {
-    margin-bottom: 1rem;
-  }
-  </style>
+    const tableHeaders = ["Estadio", "Porcentaje de audiencia (%)"];
+
+    const imprimirReporte = () => {
+      const doc = new jsPDF();
+      doc.text("Estadios con mayor audiencia", 10, 10);
+      doc.autoTable({
+        head: [tableHeaders],
+        body: reporte.map(estadio => [estadio.estadio, estadio.audiencia]),
+      });
+      doc.save("estadios_mayor_audiencia.pdf");
+    };
+
+    return {
+      reporte,
+      tableHeaders,
+      imprimirReporte,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.action-buttons {
+  margin-bottom: 1rem;
+}
+</style>
