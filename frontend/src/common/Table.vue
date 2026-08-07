@@ -31,7 +31,7 @@ export default {
       required: true,
     },
     selected: {
-      type: Number,
+      type: [Number, Object],
       default: null
     }
   }
