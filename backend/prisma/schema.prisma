@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Estadio {
+  idestadio     Int         @id @default(autoincrement())
+  nomestadio    String
+  capacidad     Int
+  partidos      Partido[]
+}
+
+model Equipo {
+  idequipo      Int         @id @default(autoincrement())
+  nomequipo     String
+  provincia     String
+  camparticip   Int
+  campganados   Int
+  mascota       String
+  color         String
+  puntos        Int
+  futbolistas   Futbolista[]
+  partidosLocal Partido[]    @relation("PartidoLocal")
+  partidosVisitante Partido[] @relation("PartidoVisitante")
+}
+
+model Partido {
+  idpartido       Int       @id @default(autoincrement())
+  audiencia       Int
+  fecha           DateTime
+  fkestadio       Int
+  local           Int
+  visitante       Int
+  goles_local     Int
+  goles_visitante Int
+  estadio         Estadio   @relation(fields: [fkestadio], references: [idestadio])
+  equipoLocal     Equipo    @relation("PartidoLocal", fields: [local], references: [idequipo])
+  equipoVisitante Equipo    @relation("PartidoVisitante", fields: [visitante], references: [idequipo])
+}
+
+model Futbolista {
+  idfutbolista Int        @id @default(autoincrement())
+  idequipo     Int
+  nombre       String
+  numero       Int
+  añosenequipo Int
+  tipo         String
+  equipo       Equipo     @relation(fields: [idequipo], references: [idequipo])
+}
+
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  password   String   
+  email      String   @unique
+  rol        Rol
+}
+
+enum Rol {
+  GESTOR
+  ADMINISTRADOR
+}
