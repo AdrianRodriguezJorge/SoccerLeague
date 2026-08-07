@@ -6,17 +6,29 @@
       <div class="row">
         <div class="col-md-12">
           <p>Seleccione una fecha y estadio y se mostrarán los partidos correspondientes:</p>
-          <div class="form-group mb-3">
-            <label for="fecha">Fecha:</label>
-            <input type="date" class="form-control" id="fecha" v-model="fecha" />
+          <input type="date" class="form-control mb-3" v-model="fecha" />
+          <Dropdown :items="estadios" v-model="estadio" id="estadio" />
+          <Button text="Generar Reporte" type="success" @click="generarReporte" class="mt-3" />
+          <div class="action-buttons mt-3">
+            <Button text="Imprimir" :icon="'fas fa-print'" type="primary" @click="imprimirReporte" />
+            <div class="send-email">
+              <input
+                type="email"
+                class="form-control email-input"
+                v-model="email"
+                placeholder="Escribe tu correo aquí"
+                required
+              />
+              <Button
+                :icon="'fas fa-envelope'"
+                text="Enviar por correo"
+                type="primary"
+                @click="enviarReporte"
+                id="dd"
+              />
+            </div>
           </div>
-          <div class="form-group mb-3">
-            <label for="estadio">Estadio:</label>
-            <Dropdown :items="estadiosList" v-model="estadio" id="estadio" />
-          </div>
-          <Button text="Generar Reporte" type="success" @click="generarReporte" class="me-2 mt-2" />
-          <Button text="Imprimir" :icon="'fas fa-print'" type="primary" @click="imprimirReporte" class="mt-2" />
-          <Table :headers="tableHeaders" :rows="formattedRows" class="mt-3" />
+          <Table :headers="tableHeaders" :rows="reporte" />
         </div>
       </div>
     </div>
@@ -24,99 +36,116 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-import { usePartidoStore } from '../../stores/partidoStore';
-import { useEstadioStore } from '../../stores/estadioStore';
 import Navbar from '../../common/Navbar.vue';
 import Button from '../../common/Button.vue';
 import Dropdown from '../../common/Dropdown.vue';
 import Table from '../../common/Table.vue';
+import apiClient from "@/apiClient";
 
 export default {
   name: "PartidosPorFecha",
   components: { Navbar, Dropdown, Button, Table },
   setup() {
-    const partidoStore = usePartidoStore();
-    const estadioStore = useEstadioStore();
-    
+    const estadios = ref([]);
     const fecha = ref('');
     const estadio = ref('Todos');
     const reporte = ref([]);
-    const tableHeaders = ["Fecha", "Estadio", "Local", "Visitante", "Resultado"];
+    const email = ref('');
 
-    onMounted(async () => {
-      await partidoStore.cargarPartidos();
-      await estadioStore.cargarEstadios();
-      
-      // Inicializar con la fecha de hoy en formato YYYY-MM-DD
-      fecha.value = new Date().toISOString().slice(0, 10);
-    });
+    const fetchEstadios = async () => {
+      try {
+        const response = await apiClient.get('/estadios');
+        estadios.value = ['Todos', ...response.data.map(estadio => estadio.nombre)];
+      } catch (error) {
+        console.error('Error al obtener los estadios:', error);
+      }
+    };
 
-    const estadiosList = computed(() => {
-      return ['Todos', ...estadioStore.estadios.map(estadio => estadio.nomestadio)];
-    });
+    const fetchReporte = async (fecha, estadio) => {
+      try {
+        const url = estadio === 'Todos' ? `/reportes/partidos-por-fecha?fecha=${fecha}` : `/reportes/partidos-por-fecha?fecha=${fecha}&estadio=${estadio}`;
+        console.log('API URL:', url); // Verificar la URL
+
+        const response = await apiClient.get(url);
+        console.log('Response:', response); // Verificar la respuesta
+
+        if (response.data && response.data.length) {
+          reporte.value = response.data.map(partido => ({
+            fecha: partido.fecha,
+            estadio: partido.estadio,
+            local: partido.local,
+            visitante: partido.visitante,
+            resultado: partido.resultado
+          }));
+        } else {
+          console.warn('No data received:', response);
+          alert('No se encontraron datos para los parámetros seleccionados.');
+        }
+      } catch (error) {
+        console.error('Error al obtener el reporte:', error);
+        alert('Hubo un error al obtener el reporte. Por favor, intenta nuevamente más tarde.');
+      }
+    };
 
     const generarReporte = () => {
       if (!fecha.value) {
-        alert("Por favor, seleccione una fecha.");
+        console.warn('Fecha no seleccionada.'); // Verificar si la fecha está seleccionada
+        alert('Por favor, seleccione una fecha.');
         return;
       }
-
-      reporte.value = partidoStore.partidos.filter(partido => {
-        const partidoDate = partido.fecha ? partido.fecha.slice(0, 10) : '';
-        const matchFecha = partidoDate === fecha.value;
-        
-        let matchEstadio = true;
-        if (estadio.value !== 'Todos') {
-          matchEstadio = partido.estadio && partido.estadio.nomestadio === estadio.value;
-        }
-        
-        return matchFecha && matchEstadio;
-      }).map(partido => {
-        const localName = partido.equipoLocal ? partido.equipoLocal.nomequipo : 'Desconocido';
-        const visitanteName = partido.equipoVisitante ? partido.equipoVisitante.nomequipo : 'Desconocido';
-        const estadioName = partido.estadio ? partido.estadio.nomestadio : 'Desconocido';
-        return {
-          fecha: new Date(partido.fecha).toLocaleDateString(),
-          estadio: estadioName,
-          local: localName,
-          visitante: visitanteName,
-          resultado: `${partido.goles_local} - ${partido.goles_visitante}`
-        };
-      });
+      console.log('Fecha seleccionada:', fecha.value); // Verificar la fecha seleccionada
+      console.log('Estadio seleccionado:', estadio.value); // Verificar el estadio seleccionado
+      fetchReporte(fecha.value, estadio.value);
     };
-
-    const formattedRows = computed(() => {
-      return reporte.value.map(partido => [
-        partido.fecha,
-        partido.estadio,
-        partido.local,
-        partido.visitante,
-        partido.resultado
-      ]);
-    });
 
     const imprimirReporte = () => {
       const doc = new jsPDF();
       doc.text("Reporte de Partidos por Fecha", 10, 10);
       doc.autoTable({
-        head: [tableHeaders],
-        body: formattedRows.value,
+        head: [["Fecha", "Estadio", "Local", "Visitante", "Resultado"]],
+        body: reporte.value.map(partido => [partido.fecha, partido.estadio, partido.local, partido.visitante, partido.resultado]),
       });
       doc.save("reporte_partidos_por_fecha.pdf");
     };
 
+    const enviarReporte = async () => {
+      const doc = new jsPDF();
+      doc.text("Reporte de Partidos por Fecha", 10, 10);
+      doc.autoTable({
+        head: [["Fecha", "Estadio", "Local", "Visitante", "Resultado"]],
+        body: reporte.value.map(partido => [partido.fecha, partido.estadio, partido.local, partido.visitante, partido.resultado]),
+      });
+      const pdf = doc.output('blob');
+      const formData = new FormData();
+      formData.append('file', pdf, 'reporte_partidos_por_fecha.pdf');
+      formData.append('email', email.value);
+      try {
+        await apiClient.post('/reportes/enviar-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        alert('Reporte enviado por correo exitosamente');
+      } catch (error) {
+        console.error('Error enviando el reporte:', error);
+        alert('Error enviando el reporte');
+      }
+    };
+
+    onMounted(fetchEstadios);
+
     return {
-      estadiosList,
+      estadios,
       fecha,
       estadio,
       reporte,
-      tableHeaders,
-      formattedRows,
       generarReporte,
       imprimirReporte,
+      enviarReporte,
+      email,
     };
   },
 };
@@ -126,7 +155,34 @@ export default {
 .main-container {
   margin-top: 20px;
 }
-.form-group {
-  max-width: 400px;
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.send-email {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.email-input {
+  margin-right: 0.5rem;
+  height: auto;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+}
+
+button {
+  width: auto;
+}
+
+#dd {
+  white-space: nowrap;
 }
 </style>

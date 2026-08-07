@@ -1,71 +1,73 @@
 import { defineStore } from 'pinia';
+import axios from 'axios';
 import { ref } from 'vue';
-import { api } from '../common/api';
+
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor to add the token to requests
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const useUsuarioStore = defineStore('usuario', () => {
   const usuarios = ref([]);
 
-  const cargarUsuarios = async () => {
+  const fetchUsuarios = async () => {
     try {
-      usuarios.value = await api.get('/usuarios');
+      const response = await apiClient.get('/usuarios');
+      usuarios.value = response.data;
     } catch (error) {
-      console.error('Error al cargar usuarios:', error);
+      console.error(error);
     }
   };
 
   const agregarUsuario = async (usuario) => {
     try {
-      const payload = {
-        nombre: usuario.nombre,
-        email: usuario.email,
-        password: usuario.password,
-        rol: usuario.rol,
-      };
-      const nuevo = await api.post('/usuarios', payload);
-      usuarios.value.push(nuevo);
-      return nuevo;
+      const response = await apiClient.post('/usuarios', usuario);
+      usuarios.value.push(response.data);
     } catch (error) {
-      console.error('Error al agregar usuario:', error);
-      throw error;
+      console.error(error);
     }
   };
 
   const actualizarUsuario = async (id, usuario) => {
     try {
-      const payload = {
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol: usuario.rol,
-      };
-      // Solo enviar contraseña si fue modificada
-      if (usuario.password) {
-        payload.password = usuario.password;
-      }
-      const actualizado = await api.put(`/usuarios/${id}`, payload);
-      const index = usuarios.value.findIndex(u => u.id === id);
+      const response = await apiClient.put(`/usuarios/${id}`, usuario);
+      const index = usuarios.value.findIndex((u) => u.id === id);
       if (index !== -1) {
-        usuarios.value[index] = actualizado;
+        usuarios.value[index] = response.data;
       }
-      return actualizado;
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
-      throw error;
+      console.error(error);
     }
   };
 
   const eliminarUsuario = async (id) => {
     try {
-      await api.delete(`/usuarios/${id}`);
-      usuarios.value = usuarios.value.filter(u => u.id !== id);
+      await apiClient.delete(`/usuarios/${id}`);
+      usuarios.value = usuarios.value.filter((u) => u.id !== id);
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
-      throw error;
+      console.error(error);
     }
   };
 
   return {
     usuarios,
-    cargarUsuarios,
+    fetchUsuarios,
     agregarUsuario,
     actualizarUsuario,
     eliminarUsuario,

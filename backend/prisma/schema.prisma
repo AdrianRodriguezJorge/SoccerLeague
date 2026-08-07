@@ -70,3 +70,10 @@ enum Rol {
   GESTOR
   ADMINISTRADOR
 }
+
+model Liga {
+  id          Int      @id @default(autoincrement())
+  fechaInicio DateTime
+  fechaFin    DateTime
+}
+

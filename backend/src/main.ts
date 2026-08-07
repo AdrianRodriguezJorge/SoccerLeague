@@ -22,8 +22,9 @@ async function bootstrap() {
   //   res.redirect('/api');
   // });
 
-  // Configuración del ValidationPipe global con mensajes de error personalizados
   app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    transformOptions: { enableImplicitConversion: true },
     exceptionFactory: (validationErrors: ValidationError[] = []) => {
       const messages = validationErrors.map(
         error => `${Object.values(error.constraints).join(', ')}`

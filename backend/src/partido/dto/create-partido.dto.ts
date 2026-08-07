@@ -6,7 +6,7 @@ export class CreatePartidoDto {
   @IsInt({ message: 'La audiencia debe ser un número entero' })
   audiencia: number;
 
-  @ApiProperty()pe
+  @ApiProperty()
   @IsDateString({ 
     // message: 'La fecha debe ser una fecha válida en formato ISO 8601' 
   })

@@ -1,58 +1,69 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { api } from '../common/api';
+import axios from 'axios';
 
-export const useEstadioStore = defineStore('estadio', () => {
-  const estadios = ref([]);
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-  const cargarEstadios = async () => {
-    try {
-      estadios.value = await api.get('/estadios');
-    } catch (error) {
-      console.error('Error al cargar estadios:', error);
+// Interceptor to add the token to requests
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  };
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-  const agregarEstadio = async (nomestadio, capacidad) => {
-    try {
-      const nuevo = await api.post('/estadios', { nomestadio, capacidad: Number(capacidad) });
-      estadios.value.push(nuevo);
-      return nuevo;
-    } catch (error) {
-      console.error('Error al agregar estadio:', error);
-      throw error;
-    }
-  };
-
-  const actualizarEstadio = async (idestadio, nomestadio, capacidad) => {
-    try {
-      const actualizado = await api.put(`/estadios/${idestadio}`, { nomestadio, capacidad: Number(capacidad) });
-      const index = estadios.value.findIndex(e => e.idestadio === idestadio);
-      if (index !== -1) {
-        estadios.value[index] = actualizado;
+export const useEstadioStore = defineStore('estadio', {
+  state: () => ({
+    estadios: [],
+  }),
+  actions: {
+    async fetchEstadios() {
+      try {
+        const response = await apiClient.get('/estadios');
+        this.estadios = response.data;
+      } catch (error) {
+        console.error(error);
       }
-      return actualizado;
-    } catch (error) {
-      console.error('Error al actualizar estadio:', error);
-      throw error;
-    }
-  };
-
-  const eliminarEstadio = async (idestadio) => {
-    try {
-      await api.delete(`/estadios/${idestadio}`);
-      estadios.value = estadios.value.filter(e => e.idestadio !== idestadio);
-    } catch (error) {
-      console.error('Error al eliminar estadio:', error);
-      throw error;
-    }
-  };
-
-  return {
-    estadios,
-    cargarEstadios,
-    agregarEstadio,
-    actualizarEstadio,
-    eliminarEstadio,
-  };
+    },
+    async addEstadio(estadio) {
+      try {
+        const response = await apiClient.post('/estadios', estadio);
+        this.estadios.push(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async updateEstadio(id, estadio) {
+      try {
+        console.log("updateEstadio - id: ", id);
+        const response = await apiClient.put(`/estadios/${id}`, estadio);
+        const index = this.estadios.findIndex((e) => e.idestadio === id);
+        if (index !== -1) {
+          this.estadios[index] = response.data;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async removeEstadio(id) {
+      try {
+        console.log("removeEstadio - id: ", id);
+        await apiClient.delete(`/estadios/${id}`);
+        console.log("después de llamar al apiClient");
+        this.estadios = this.estadios.filter((e) => e.idestadio !== id);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  },
 });

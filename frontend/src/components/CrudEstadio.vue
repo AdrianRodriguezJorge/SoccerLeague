@@ -1,121 +1,218 @@
 <template>
-  <div>
-    <Navbar />
-    <div class="container main-container">
-      <h1>Gestión de Estadios</h1>
-      <div class="row">
-        <div class="col-md-4">
-          <form @submit.prevent="agregarEstadio" class="d-flex flex-column">
-            <div class="form-group mb-3">
-              <label for="nombre">Nombre</label>
-              <input type="text" class="form-control" id="nombre" v-model="nuevoEstadio.nombre" required />
-            </div>
-            <div class="form-group mb-3">
-              <label for="capacidad">Capacidad</label>
-              <input type="number" class="form-control" id="capacidad" v-model="nuevoEstadio.capacidad" required />
-            </div>
-            <div class="d-flex justify-content-start">
-              <button type="submit" class="btn btn-success me-2">
-                {{ isEditing ? 'Actualizar' : 'Agregar' }}
-              </button>
-              <button type="button" class="btn btn-secondary me-2" v-if="isEditing" @click="cancelarEdicion">Cancelar</button>
-              <button type="button" class="btn btn-danger" v-if="selectedEstadio !== null" @click="eliminarEstadio">Eliminar</button>
-            </div>
-          </form>
+  <Navbar />
+  <div class="todo">
+    <h1 class="text-center">Gestor de Estadios</h1>
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-primary" @click="showAddStadiumModal">Añadir Estadio</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Capacidad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="stadium in filteredStadiums" :key="stadium.idestadio">
+            <td>{{ stadium.nomestadio }}</td>
+            <td>{{ stadium.capacidad }}</td>
+            <td>
+              <button @click="editStadium(stadium)" class="btn btn-warning btn-sm">Editar</button>
+              <button @click="confirmDeleteStadium(stadium)" class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal para añadir estadio -->
+    <div v-if="isAdding" class="modal" tabindex="-1" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Añadir Estadio</h5>
+            <button type="button" class="btn-close" @click="isAdding = false"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="addStadium">
+              <div class="mb-3">
+                <label for="addName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="addName" v-model="addForm.nomestadio">
+              </div>
+              <div class="mb-3">
+                <label for="addCapacity" class="form-label">Capacidad</label>
+                <input type="number" class="form-control" id="addCapacity" v-model="addForm.capacidad">
+              </div>
+              <button type="submit" class="btn btn-primary">Añadir Estadio</button>
+            </form>
+            <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+          </div>
         </div>
-        <div class="col-md-8">
-          <Table :headers="tableHeaders" :rows="formattedEstadios" @select="seleccionarEstadio" :selected="selectedEstadio" />
+      </div>
+    </div>
+
+    <!-- Modal para editar estadio -->
+    <div v-if="isEditing" class="modal" tabindex="-1" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Estadio</h5>
+            <button type="button" class="btn-close" @click="isEditing = false"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="updateStadium">
+              <div class="mb-3">
+                <label for="editName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="editName" v-model="editForm.nomestadio">
+              </div>
+              <div class="mb-3">
+                <label for="editCapacity" class="form-label">Capacidad</label>
+                <input type="number" class="form-control" id="editCapacity" v-model="editForm.capacidad">
+              </div>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div v-if="isConfirmingDelete" class="modal" tabindex="-1" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" @click="isConfirmingDelete = false"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar este estadio?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="isConfirmingDelete = false">Cancelar</button>
+            <button type="button" class="btn btn-danger" @click="deleteStadium">Eliminar</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted } from 'vue';
-import { useEstadioStore } from '../stores/estadioStore';
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 import Navbar from '../common/Navbar.vue';
-import Table from '../common/Table.vue';
 
-export default {
-  components: { Navbar, Table },
-  setup() {
-    const estadioStore = useEstadioStore();
-    const nuevoEstadio = ref({ nombre: '', capacidad: '' });
-    const isEditing = ref(false);
-    const selectedEstadio = ref(null);
-    const currentIndex = ref(null);
+const stadiums = ref([]);
+const isEditing = ref(false);
+const isAdding = ref(false);
+const isConfirmingDelete = ref(false);
+const editForm = ref({ idestadio: null, nomestadio: '', capacidad: '' });
+const addForm = ref({ nomestadio: '', capacidad: '' });
+const stadiumToDelete = ref(null);
+const errorMessage = ref('');
+const searchTerm = ref('');
 
-    onMounted(async () => {
-      await estadioStore.cargarEstadios();
+const fetchStadiums = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    console.log('Fetching stadiums...');
+    const response = await axios.get('http://localhost:3000/estadios', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
-
-    const agregarEstadio = async () => {
-      try {
-        if (isEditing.value) {
-          const estadio = estadioStore.estadios[currentIndex.value];
-          await estadioStore.actualizarEstadio(estadio.idestadio, nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
-          isEditing.value = false;
-        } else {
-          await estadioStore.agregarEstadio(nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
-        }
-        nuevoEstadio.value.nombre = '';
-        nuevoEstadio.value.capacidad = '';
-        selectedEstadio.value = null;
-      } catch (err) {
-        alert('Error al guardar estadio: ' + err.message);
-      }
-    };
-
-    const seleccionarEstadio = (index) => {
-      selectedEstadio.value = index;
-      const estadio = estadioStore.estadios[selectedEstadio.value];
-      nuevoEstadio.value.nombre = estadio.nomestadio;
-      nuevoEstadio.value.capacidad = estadio.capacidad;
-      isEditing.value = true;
-      currentIndex.value = selectedEstadio.value;
-    };
-
-    const eliminarEstadio = async () => {
-      try {
-        const estadio = estadioStore.estadios[selectedEstadio.value];
-        await estadioStore.eliminarEstadio(estadio.idestadio);
-        selectedEstadio.value = null;
-        isEditing.value = false;
-        nuevoEstadio.value.nombre = '';
-        nuevoEstadio.value.capacidad = '';
-      } catch (err) {
-        alert('Error al eliminar estadio: ' + err.message);
-      }
-    };
-
-    const cancelarEdicion = () => {
-      isEditing.value = false;
-      nuevoEstadio.value.nombre = '';
-      nuevoEstadio.value.capacidad = '';
-      selectedEstadio.value = null;
-    };
-
-    return {
-      estadios: estadioStore.estadios,
-      nuevoEstadio,
-      agregarEstadio,
-      eliminarEstadio,
-      seleccionarEstadio,
-      cancelarEdicion,
-      tableHeaders: ['Nombre', 'Capacidad'],
-      formattedEstadios: computed(() =>
-        estadioStore.estadios.map((estadio) => [estadio.nomestadio, estadio.capacidad])
-      ),
-      isEditing,
-      selectedEstadio
-    };
+    stadiums.value = response.data;
+    console.log('Stadiums fetched:', stadiums.value);
+  } catch (error) {
+    console.error('Error al obtener los estadios:', error);
   }
 };
-</script>
 
-<style scoped>
-.main-container {
-  margin-top: 50px;
-}
-</style>
+const showAddStadiumModal = () => {
+  addForm.value = { nomestadio: '', capacidad: '' };
+  isAdding.value = true;
+  errorMessage.value = '';
+};
+
+const addStadium = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    console.log('Adding stadium...', addForm.value);
+    await axios.post('http://localhost:3000/estadios', addForm.value, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    isAdding.value = false;
+    console.log('Stadium added successfully');
+    fetchStadiums();
+  } catch (error) {
+    if (error.response) {
+      errorMessage.value = `${error.response.data.message}`;
+    } else {
+      console.error('Error al añadir el estadio:', error);
+    }
+  }
+};
+
+const editStadium = (stadium) => {
+  editForm.value = { ...stadium };
+  isEditing.value = true;
+  console.log('Editing stadium:', editForm.value);
+};
+
+const updateStadium = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    console.log(editForm.value.idestadio);
+    await axios.put(`http://localhost:3000/estadios/${editForm.value.idestadio}`, editForm.value, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    isEditing.value = false;
+    fetchStadiums();
+  } catch (error) {
+    console.error('Error al actualizar el estadio:', error);
+  }
+};
+
+const confirmDeleteStadium = (stadium) => {
+  stadiumToDelete.value = stadium;
+  isConfirmingDelete.value = true;
+  console.log('Confirm delete stadium:', stadiumToDelete.value);
+};
+
+const deleteStadium = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    console.log('Deleting stadium...', stadiumToDelete.value);
+    await axios.delete(`http://localhost:3000/estadios/${stadiumToDelete.value.idestadio}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    isConfirmingDelete.value = false;
+    console.log('Stadium deleted successfully');
+    fetchStadiums();
+  } catch (error) {
+    console.error('Error al eliminar el estadio:', error);
+  }
+};
+
+const filteredStadiums = computed(() => {
+  if (!searchTerm.value) {
+    return stadiums.value;
+  }
+  return stadiums.value.filter(stadium =>
+    stadium.nomestadio.toLowerCase().includes(searchTerm.value.toLowerCase())
+  );
+});
+
+onMounted(() => {
+  console.log('Component mounted, fetching stadiums...');
+  fetchStadiums();
+});
+</script>

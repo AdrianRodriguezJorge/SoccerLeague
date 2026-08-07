@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/principal">Liga Nacional de Fútbol</router-link>
+      <router-link class="navbar-brand" to="/">Liga Nacional de Fútbol</router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -15,7 +15,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown" v-for="(item, index) in menuItems" :key="index">
+          <li class="nav-item dropdown" v-for="(item, index) in filteredMenuItems" :key="index">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -27,50 +27,68 @@
               {{ item.name }}
             </a>
             <ul class="dropdown-menu" :aria-labelledby="item.id">
-              <template v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
-                <router-link
-                  v-if="!subItem.action && subItem.to !== '#'"
-                  :to="subItem.to"
-                  class="dropdown-item"
-                >
-                  {{ subItem.name }}
-                </router-link>
-                <a
-                  v-else
-                  href="#"
-                  class="dropdown-item"
-                  @click.prevent="handleMenuItemClick(subItem.action || subItem.name)"
-                >
-                  {{ subItem.name }}
-                </a>
-              </template>
+              <router-link
+                v-for="(subItem, subIndex) in item.subItems"
+                :key="subIndex"
+                :to="subItem.to"
+                class="dropdown-item"
+                @click="subItem.action ? handleMenuItemClick(subItem.action) : null"
+              >
+                {{ subItem.name }}
+              </router-link>
             </ul>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
+          <li class="nav-item" v-if="usuarioActual">
             <span class="nav-link" style="color: white;">
               Usuario: {{ usuarioActual }}
             </span>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-link nav-link" @click="usuarioActual ? cerrarSesion() : iniciarSesion()" style="color: white;">
+              {{ usuarioActual ? 'Cerrar sesión' : 'Iniciar sesión' }}
+            </button>
           </li>
         </ul>
       </div>
     </div>
   </nav>
+
+  <!-- Modal para iniciar liga -->
+  <b-modal v-model="showLigaModal" title="Iniciar Liga" centered>
+    <div class="form-group">
+      <label for="fechaInicio">Fecha de Inicio</label>
+      <input type="date" class="form-control" v-model="fechaInicio" required />
+    </div>
+    <div class="form-group">
+      <label for="fechaFin">Fecha de Fin</label>
+      <input type="date" class="form-control" v-model="fechaFin" required />
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+      <button class="btn btn-success btn-block" @click="iniciarLigaFechas">Iniciar Liga</button>
+    </div>
+  </b-modal>
 </template>
 
 <script>
+import axios from 'axios';
+import { BModal } from 'bootstrap-vue-3';
+
 export default {
   name: "Navbar",
+  components: {
+    BModal,
+  },
   data() {
     return {
       menuItems: [
         {
-          name: 'Perfil',
+          name: 'Configuración',
           id: 'perfilDropdown',
           subItems: [
-            { to: '/', name: 'Iniciar sesión' },
-            { to: '#', name: 'Cerrar sesión', action: 'Cerrar sesión' },
+            // { to: '/login', name: 'Iniciar sesión' },
+            // { to: '/', name: 'Cerrar sesión', action: 'cerrarSesion' },
             { to: '/crud-usuario', name: 'Gestión de usuarios' }
           ]
         },
@@ -93,37 +111,68 @@ export default {
             { to: '/tabla-posiciones', name: 'Tabla de posiciones de la liga' },
             { to: '/partidos-por-equipos', name: 'Partidos por equipos' },
             { to: '/partidos-por-fecha', name: 'Partidos jugados por fecha' },
-            { to: '/entrenadores-exp', name: 'Entrenadores con más experiencia' },
             { to: '/estadios-mayor-audiencia', name: 'Estadios con mayor audiencia' },
-            { to: '/estado-equipo', name: 'Estado de un equipo' },
+            // { to: '/estado-equipo', name: 'Estado de un equipo' },
           ]
         }
       ],
-      usuarioActual: null,
+      usuarioActual: localStorage.getItem('usuario'),
+      rolUsuario: localStorage.getItem('rol'),
+      showLigaModal: false,
+      fechaInicio: '',
+      fechaFin: '',
     };
   },
-  mounted() {
-    this.actualizarEstadoUsuario();
+  computed: {
+    filteredMenuItems() {
+      return this.menuItems.filter(item => this.shouldShowMenu(item.name));
+    }
   },
   methods: {
-    actualizarEstadoUsuario() {
-      this.usuarioActual = localStorage.getItem('username') || 'Invitado';
-    },
     handleMenuItemClick(action) {
-      if (action === 'Cerrar sesión') {
+      if (action === 'cerrarSesion') {
         this.cerrarSesion();
       } else if (action === 'iniciarLiga') {
-        this.$emit('iniciarLiga');
+        this.showLigaModal = true;
       } else if (action === 'culminarLiga') {
         this.$emit('culminarLiga');
       }
     },
+    shouldShowMenu(menuName) {
+      if (menuName === 'Gestión de la liga') {
+        return this.rolUsuario === 'GESTOR';
+      } else if (menuName === 'Configuración') {
+        return this.rolUsuario === 'ADMINISTRADOR';
+      }
+      return true;
+    },
     cerrarSesion() {
+      localStorage.removeItem('usuario');
       localStorage.removeItem('token');
-      localStorage.removeItem('username');
       localStorage.removeItem('rol');
       this.usuarioActual = null;
+      this.rolUsuario = null;
       this.$router.push('/');
+    },
+    iniciarSesion() {
+      this.$router.push('/login');
+    },
+    async iniciarLigaFechas() {
+      if (new Date(this.fechaInicio) >= new Date(this.fechaFin)) {
+        alert('La fecha de fin debe ser posterior a la fecha de inicio.');
+        return;
+      }
+      try {
+        await axios.post('http://localhost:3000/liga/iniciar', {
+          fechaInicio: this.fechaInicio,
+          fechaFin: this.fechaFin,
+        });
+        alert('Liga iniciada correctamente.');
+        this.showLigaModal = false;
+      } catch (error) {
+        console.error('Error iniciando la liga:', error);
+        alert('Error iniciando la liga.');
+      }
     }
   }
 };
@@ -132,6 +181,7 @@ export default {
 <style scoped>
 .navbar {
   margin-bottom: 20px;
+  color: white;
 }
 .navbar-brand {
   margin-left: 15px;

@@ -67,4 +67,18 @@ export class AuthService {
             rol,
         };
     }
+
+    async changePassword(nombre: string, oldPass: string, newPass: string) {
+        this.logger.debug(`Changing password for user: ${nombre}`);
+        const user = await this.usuarioService.findByName(nombre);
+        if (!user) {
+            throw new UnauthorizedException('Usuario no encontrado');
+        }
+        const isOldValid = await bcrypt.compare(oldPass, user.password);
+        if (!isOldValid) {
+            throw new UnauthorizedException('Contraseña anterior incorrecta');
+        }
+        await this.usuarioService.update(user.id, { password: newPass });
+        return { success: true, message: 'Contraseña cambiada con éxito' };
+    }
 }

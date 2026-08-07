@@ -8,6 +8,8 @@ import { FutbolistaModule } from './futbolista/futbolista.module';
 import { PartidoModule } from './partido/partido.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
+import { LigaModule } from './liga/liga.module';
+import { ReportesModule } from './reportes/reportes.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AuthModule } from './auth/auth.module';
     PartidoModule, 
     UsuarioModule, 
     AuthModule,
+    LigaModule,
+    ReportesModule,
   ],
   controllers: [AppController],
   providers: [

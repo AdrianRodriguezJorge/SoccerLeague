@@ -10,6 +10,22 @@
           type="primary"
           @click="imprimirReporte"
         />
+        <div class="send-email">
+          <input
+            type="email"
+            class="form-control email-input"
+            v-model="email"
+            placeholder="Escribe tu correo aquí"
+            required
+          />
+          <Button
+            :icon="'fas fa-envelope'"
+            text="Enviar por correo"
+            type="primary"
+            @click="enviarReporte"
+            id="dd"
+          />
+        </div>
       </div>
       <Table :headers="tableHeaders" :rows="reporte" />
     </div>
@@ -19,12 +35,11 @@
 <script>
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-import { computed, onMounted } from 'vue';
-import { useEstadioStore } from '../../stores/estadioStore';
-import { usePartidoStore } from '../../stores/partidoStore';
+import { ref, onMounted } from "vue";
 import Navbar from '../../common/Navbar.vue';
 import Button from '../../common/Button.vue';
 import Table from '../../common/Table.vue';
+import apiClient from "@/apiClient";
 
 export default {
   name: "EstadiosMayorAudiencia",
@@ -34,49 +49,66 @@ export default {
     Table,
   },
   setup() {
-    const estadioStore = useEstadioStore();
-    const partidoStore = usePartidoStore();
+    const reporte = ref([]);
+    const email = ref('');
+    const tableHeaders = ["Estadio", "Porcentaje de audiencia (%)"];
 
-    onMounted(async () => {
-      await estadioStore.cargarEstadios();
-      await partidoStore.cargarPartidos();
-    });
-
-    const reporte = computed(() => {
-      return estadioStore.estadios.map(estadio => {
-        const partidosDeEstadio = partidoStore.partidos.filter(p => p.fkestadio === estadio.idestadio);
-        const sumAudiencia = partidosDeEstadio.reduce((sum, p) => sum + p.audiencia, 0);
-        const countPartidos = partidosDeEstadio.length;
-        const avgAudiencia = countPartidos > 0 ? (sumAudiencia / countPartidos) : 0;
-        const pct = estadio.capacidad > 0 ? ((avgAudiencia / estadio.capacidad) * 100).toFixed(2) : '0.00';
-        
-        return [
-          estadio.nomestadio,
-          `${pct}% (${Math.round(avgAudiencia)} espectadores de promedio)`
-        ];
-      }).sort((a, b) => {
-        const pctA = parseFloat(a[1]);
-        const pctB = parseFloat(b[1]);
-        return pctB - pctA;
-      });
-    });
-
-    const tableHeaders = ["Estadio", "Porcentaje de audiencia de la capacidad (%)"];
+    const fetchReporte = async () => {
+      try {
+        const response = await apiClient.get('/reportes/audiencia');
+        console.log(response.data);
+        reporte.value = response.data.map((row) => ({
+          estadio: row.estadio,
+          audiencia: row.assistancePercentage,
+        }));
+      } catch (error) {
+        reporte.value = [];
+        console.error("Error fetching report:", error);
+      }
+    };
 
     const imprimirReporte = () => {
       const doc = new jsPDF();
       doc.text("Estadios con mayor audiencia", 10, 10);
       doc.autoTable({
         head: [tableHeaders],
-        body: reporte.value,
+        body: reporte.value.map((estadio) => [estadio.estadio, estadio.audiencia]),
       });
       doc.save("estadios_mayor_audiencia.pdf");
     };
+
+    const enviarReporte = async () => {
+      const doc = new jsPDF();
+      doc.text("Estadios con mayor audiencia", 10, 10);
+      doc.autoTable({
+        head: [tableHeaders],
+        body: reporte.value.map((estadio) => [estadio.estadio, estadio.audiencia]),
+      });
+      const pdf = doc.output('blob');
+      const formData = new FormData();
+      formData.append('file', pdf, 'estadios_mayor_audiencia.pdf');
+      formData.append('email', email.value);
+      try {
+        await apiClient.post('/reportes/enviar-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        alert('Reporte enviado por correo exitosamente');
+      } catch (error) {
+        console.error('Error enviando el reporte:', error);
+        alert('Error enviando el reporte');
+      }
+    };
+
+    onMounted(fetchReporte);
 
     return {
       reporte,
       tableHeaders,
       imprimirReporte,
+      enviarReporte,
+      email,
     };
   },
 };
@@ -85,8 +117,28 @@ export default {
 <style scoped>
 .action-buttons {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }
-.main-container {
-  margin-top: 50px;
+
+.send-email {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.email-input {
+  margin-right: 0.5rem;
+  height: auto;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+}
+
+button {
+  width: auto;
+}
+
+#dd {
+  white-space: nowrap;
 }
 </style>
