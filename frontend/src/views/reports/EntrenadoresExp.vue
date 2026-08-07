@@ -19,6 +19,7 @@
 <script>
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { computed, onMounted } from 'vue';
 import { useFutbolistaStore } from '../../stores/futbolistaStore';
 import Navbar from '../../common/Navbar.vue';
 import Button from '../../common/Button.vue';
@@ -33,17 +34,24 @@ export default {
   },
   setup() {
     const futbolistaStore = useFutbolistaStore();
-    const entrenadores = futbolistaStore.futbolistas
-      .filter(futbolista => futbolista.esEntrenador)
-      .sort((a, b) => b.anosEnEquipo - a.anosEnEquipo);
 
-    const reporte = entrenadores.map(entrenador => ({
-      nombre: entrenador.nombre,
-      numero: entrenador.numero,
-      experiencia: entrenador.anosEnEquipo,
-      equipo: entrenador.equipo,
-      campeonatos: entrenador.campeonatos
-    }));
+    onMounted(async () => {
+      await futbolistaStore.cargarFutbolistas();
+    });
+
+    const reporte = computed(() => {
+      const entrenadores = futbolistaStore.futbolistas
+        .filter(futbolista => futbolista.tipo === 'Entrenador')
+        .sort((a, b) => b.añosenequipo - a.añosenequipo);
+
+      return entrenadores.map(entrenador => [
+        entrenador.nombre,
+        entrenador.numero,
+        entrenador.añosenequipo,
+        entrenador.equipo ? entrenador.equipo.nomequipo : 'Sin equipo',
+        entrenador.equipo ? entrenador.equipo.campganados : 0
+      ]);
+    });
 
     const tableHeaders = [
       "Nombre",
@@ -58,7 +66,7 @@ export default {
       doc.text("Entrenadores con más experiencia", 10, 10);
       doc.autoTable({
         head: [tableHeaders],
-        body: reporte.map(entrenador => Object.values(entrenador)),
+        body: reporte.value,
       });
       doc.save("entrenadores_mas_experiencia.pdf");
     };
@@ -75,5 +83,8 @@ export default {
 <style scoped>
 .action-buttons {
   margin-bottom: 1rem;
+}
+.main-container {
+  margin-top: 50px;
 }
 </style>

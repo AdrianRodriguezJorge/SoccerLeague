@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import { api } from '../common/api';
+
 export default {
   data() {
     return {
@@ -52,15 +54,25 @@ export default {
     };
   },
   methods: {
-    login() {
-      if (this.username === 'admin' && this.password === 'admin') {
+    async login() {
+      this.errorMessage = '';
+      try {
+        const response = await api.post('/auth/login', {
+          nombre: this.username,
+          password: this.password
+        });
+        
+        // Almacenar datos en localStorage
+        localStorage.setItem('token', response.accesToken);
+        localStorage.setItem('username', response.username);
+        localStorage.setItem('rol', response.rol);
+
         this.$router.push('/principal');
-      } else {
-        this.errorMessage = 'Usuario o contraseña incorrectos';
+      } catch (error) {
+        this.errorMessage = error.message || 'Usuario o contraseña incorrectos';
       }
     },
     forgotPassword() {
-      // Lógica para manejar el olvido de la contraseña
       alert('Redirigiendo a la página de recuperación de contraseña');
     }
   }

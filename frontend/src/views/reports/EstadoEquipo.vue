@@ -6,9 +6,11 @@
       <div class="row">
         <div class="col-md-12">
           <p>Seleccione el equipo para ver su estado:</p>
-          <Dropdown :items="equipos" v-model="equipoSeleccionado" @itemSelected="updateSelectedItem" />
-          <Button text="Generar Reporte" type="success" @click="generarReporte" class="mt-3" />
-          <Button text="Imprimir" :icon="'fas fa-print'" type="primary" @click="imprimirReporte" class="mt-3" />
+          <div class="form-group mb-3" style="max-width: 400px;">
+            <Dropdown :items="equiposList" v-model="equipoSeleccionado" @itemSelected="updateSelectedItem" />
+          </div>
+          <Button text="Generar Reporte" type="success" @click="generarReporte" class="me-2 mt-2" />
+          <Button text="Imprimir" :icon="'fas fa-print'" type="primary" @click="imprimirReporte" class="mt-2" />
           <Table :headers="tableHeaders" :rows="tableRows" class="mt-3" />
         </div>
       </div>
@@ -17,10 +19,11 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { useEquipoStore } from '../../stores/equipoStore';
+import { usePartidoStore } from '../../stores/partidoStore';
 import Navbar from '../../common/Navbar.vue';
 import Button from '../../common/Button.vue';
 import Dropdown from '../../common/Dropdown.vue';
@@ -36,14 +39,28 @@ export default {
   },
   setup() {
     const equipoStore = useEquipoStore();
-    const equipos = equipoStore.equipos.map(equipo => equipo.nombre);
+    const partidoStore = usePartidoStore();
+
     const equipoSeleccionado = ref(null);
     const tableHeaders = ["Resultado", "Total", "Como Local", "Como Visitante"];
     const tableRows = ref([
-      { Resultado: "Ganados", Total: 0, "Como Local": 0, "Como Visitante": 0 },
-      { Resultado: "Empatados", Total: 0, "Como Local": 0, "Como Visitante": 0 },
-      { Resultado: "Perdidos", Total: 0, "Como Local": 0, "Como Visitante": 0 },
+      ["Ganados", 0, 0, 0],
+      ["Empatados", 0, 0, 0],
+      ["Perdidos", 0, 0, 0],
     ]);
+
+    onMounted(async () => {
+      await equipoStore.cargarEquipos();
+      await partidoStore.cargarPartidos();
+      if (equipoStore.equipos.length > 0) {
+        equipoSeleccionado.value = equipoStore.equipos[0].nomequipo;
+        generarReporte();
+      }
+    });
+
+    const equiposList = computed(() => {
+      return equipoStore.equipos.map(equipo => equipo.nomequipo);
+    });
 
     const updateSelectedItem = (value) => {
       equipoSeleccionado.value = value;
@@ -55,56 +72,71 @@ export default {
         return;
       }
 
-      const equipo = equipoStore.equipos.find(e => e.nombre === equipoSeleccionado.value);
+      const equipo = equipoStore.equipos.find(e => e.nomequipo === equipoSeleccionado.value);
 
       if (equipo) {
-        const reporte = {
-          totalGanados: equipo.ganados || 0,
-          localGanados: equipo.localGanados || 0,
-          visitanteGanados: equipo.visitanteGanados || 0,
-          totalEmpatados: equipo.empatados || 0,
-          localEmpatados: equipo.localEmpatados || 0,
-          visitanteEmpatados: equipo.visitanteEmpatados || 0,
-          totalPerdidos: equipo.perdidos || 0,
-          localPerdidos: equipo.localPerdidos || 0,
-          visitantePerdidos: equipo.visitantePerdidos || 0,
-        };
+        let localGanados = 0;
+        let localEmpatados = 0;
+        let localPerdidos = 0;
+        let visitanteGanados = 0;
+        let visitanteEmpatados = 0;
+        let visitantePerdidos = 0;
+
+        partidoStore.partidos.forEach(partido => {
+          if (partido.local === equipo.idequipo) {
+            if (partido.goles_local > partido.goles_visitante) {
+              localGanados++;
+            } else if (partido.goles_local === partido.goles_visitante) {
+              localEmpatados++;
+            } else {
+              localPerdidos++;
+            }
+          } else if (partido.visitante === equipo.idequipo) {
+            if (partido.goles_visitante > partido.goles_local) {
+              visitanteGanados++;
+            } else if (partido.goles_visitante === partido.goles_local) {
+              visitanteEmpatados++;
+            } else {
+              visitantePerdidos++;
+            }
+          }
+        });
 
         tableRows.value = [
-          {
-            Resultado: "Ganados",
-            Total: reporte.totalGanados,
-            "Como Local": reporte.localGanados,
-            "Como Visitante": reporte.visitanteGanados,
-          },
-          {
-            Resultado: "Empatados",
-            Total: reporte.totalEmpatados,
-            "Como Local": reporte.localEmpatados,
-            "Como Visitante": reporte.visitanteEmpatados,
-          },
-          {
-            Resultado: "Perdidos",
-            Total: reporte.totalPerdidos,
-            "Como Local": reporte.localPerdidos,
-            "Como Visitante": reporte.visitantePerdidos,
-          },
+          [
+            "Ganados",
+            localGanados + visitanteGanados,
+            localGanados,
+            visitanteGanados,
+          ],
+          [
+            "Empatados",
+            localEmpatados + visitanteEmpatados,
+            localEmpatados,
+            visitanteEmpatados,
+          ],
+          [
+            "Perdidos",
+            localPerdidos + visitantePerdidos,
+            localPerdidos,
+            visitantePerdidos,
+          ],
         ];
       }
     };
 
     const imprimirReporte = () => {
       const doc = new jsPDF();
-      doc.text("Reporte de Estado de un Equipo", 10, 10);
+      doc.text("Reporte de Estado de un Equipo: " + (equipoSeleccionado.value || ""), 10, 10);
       doc.autoTable({
         head: [tableHeaders],
-        body: tableRows.value.map((row) => Object.values(row)),
+        body: tableRows.value,
       });
       doc.save("reporte_estado_equipo.pdf");
     };
 
     return {
-      equipos,
+      equiposList,
       equipoSeleccionado,
       tableHeaders,
       tableRows,
@@ -117,7 +149,7 @@ export default {
 </script>
 
 <style scoped>
-.mt-3 {
-  margin-top: 1rem;
+.main-container {
+  margin-top: 20px;
 }
 </style>

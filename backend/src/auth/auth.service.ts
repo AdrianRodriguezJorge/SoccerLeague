@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
 
         this.logger.debug(`Authentication successful for user: ${JSON.stringify(nombre)}`);
 
-        return this.signIn(user.userId, user.username)
+        return this.signIn(user.userId, user.username, user.rol);
     }
 
     async validateUser(nombre: string, password: string) {
@@ -37,11 +38,12 @@ export class AuthService {
             this.logger.warn(`User not found: ${JSON.stringify(nombre)}`);
         }
 
-        if (user && user.password === password) {
+        if (user && await bcrypt.compare(password, user.password)) {
             this.logger.debug(`Password validation successful for user: ${JSON.stringify(nombre)}`);
             return {
                 userId: user.id,
-                username: user.nombre
+                username: user.nombre,
+                rol: user.rol,
             };
         }
 
@@ -49,10 +51,11 @@ export class AuthService {
         return null;
     }
 
-    async signIn(userId: number, username: string) {
+    async signIn(userId: number, username: string, rol: string) {
         const tokenPayload = {
             sub: userId,
-            username: username
+            username: username,
+            rol: rol,
         };
 
         const accesToken = await this.jwtService.signAsync(tokenPayload);
@@ -60,7 +63,8 @@ export class AuthService {
         return {
             accesToken,
             username,
-            userId
-        }
+            userId,
+            rol,
+        };
     }
 }

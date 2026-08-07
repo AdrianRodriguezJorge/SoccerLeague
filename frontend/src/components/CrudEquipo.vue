@@ -8,7 +8,7 @@
           <form @submit.prevent="agregarEquipo" class="d-flex flex-column">
             <div class="form-group mb-3">
               <label for="nombre">Nombre</label>
-              <input type="text" class="form-control" id="nombre" v-model="nuevoEquipo.nombre" required />
+              <input type="text" class="form-control" id="nombre" v-model="nuevoEquipo.nomequipo" required />
             </div>
             <div class="form-group mb-3">
               <label for="provincia">Provincia</label>
@@ -16,11 +16,11 @@
             </div>
             <div class="form-group mb-3">
               <label for="campParticip">Campeonatos Participados</label>
-              <input type="number" class="form-control" id="campParticip" v-model="nuevoEquipo.campParticip" min="0" required />
+              <input type="number" class="form-control" id="campParticip" v-model="nuevoEquipo.camparticip" min="0" required />
             </div>
             <div class="form-group mb-3">
               <label for="campGanados">Campeonatos Ganados</label>
-              <input type="number" class="form-control" id="campGanados" v-model="nuevoEquipo.campGanados" min="0" required />
+              <input type="number" class="form-control" id="campGanados" v-model="nuevoEquipo.campganados" min="0" required />
             </div>
             <div class="form-group mb-3">
               <label for="mascota">Mascota</label>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useEquipoStore } from '../stores/equipoStore';
 import Navbar from '../common/Navbar.vue';
 import Table from '../common/Table.vue';
@@ -62,10 +62,10 @@ export default {
   setup() {
     const equipoStore = useEquipoStore();
     const nuevoEquipo = ref({
-      nombre: '',
+      nomequipo: '',
       provincia: '',
-      campParticip: 0,
-      campGanados: 0,
+      camparticip: 0,
+      campganados: 0,
       mascota: '',
       color: '',
       puntos: 0
@@ -74,14 +74,23 @@ export default {
     const selectedEquipo = ref(null);
     const currentIndex = ref(null);
 
-    const agregarEquipo = () => {
-      if (isEditing.value) {
-        equipoStore.actualizarEquipo(currentIndex.value, nuevoEquipo.value);
-        isEditing.value = false;
-      } else {
-        equipoStore.agregarEquipo(nuevoEquipo.value);
+    onMounted(async () => {
+      await equipoStore.cargarEquipos();
+    });
+
+    const agregarEquipo = async () => {
+      try {
+        if (isEditing.value) {
+          const equipo = equipoStore.equipos[currentIndex.value];
+          await equipoStore.actualizarEquipo(equipo.idequipo, nuevoEquipo.value);
+          isEditing.value = false;
+        } else {
+          await equipoStore.agregarEquipo(nuevoEquipo.value);
+        }
+        resetForm();
+      } catch (err) {
+        alert('Error al guardar equipo: ' + err.message);
       }
-      resetForm();
     };
 
     const seleccionarEquipo = (index) => {
@@ -92,9 +101,14 @@ export default {
       currentIndex.value = selectedEquipo.value;
     };
 
-    const eliminarEquipo = () => {
-      equipoStore.eliminarEquipo(selectedEquipo.value);
-      resetForm();
+    const eliminarEquipo = async () => {
+      try {
+        const equipo = equipoStore.equipos[selectedEquipo.value];
+        await equipoStore.eliminarEquipo(equipo.idequipo);
+        resetForm();
+      } catch (err) {
+        alert('Error al eliminar equipo: ' + err.message);
+      }
     };
 
     const cancelarEdicion = () => {
@@ -103,10 +117,10 @@ export default {
 
     const resetForm = () => {
       nuevoEquipo.value = {
-        nombre: '',
+        nomequipo: '',
         provincia: '',
-        campParticip: 0,
-        campGanados: 0,
+        camparticip: 0,
+        campganados: 0,
         mascota: '',
         color: '',
         puntos: 0
@@ -125,10 +139,10 @@ export default {
       tableHeaders: ['Nombre', 'Provincia', 'Campeonatos Participados', 'Campeonatos Ganados', 'Mascota', 'Color', 'Puntos'],
       formattedEquipos: computed(() =>
         equipoStore.equipos.map(equipo => [
-          equipo.nombre,
+          equipo.nomequipo,
           equipo.provincia,
-          equipo.campParticip,
-          equipo.campGanados,
+          equipo.camparticip,
+          equipo.campganados,
           equipo.mascota,
           equipo.color,
           equipo.puntos
@@ -144,12 +158,5 @@ export default {
 <style scoped>
 .main-container {
   margin-top: 50px;
-}
-.table tr.selected {
-  background-color: #d3d3d3;
-}
-
-.btn {
-  margin-bottom: 10px;
 }
 </style>

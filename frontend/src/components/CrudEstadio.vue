@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useEstadioStore } from '../stores/estadioStore';
 import Navbar from '../common/Navbar.vue';
 import Table from '../common/Table.vue';
@@ -46,33 +46,47 @@ export default {
     const selectedEstadio = ref(null);
     const currentIndex = ref(null);
 
-    const agregarEstadio = () => {
-      if (isEditing.value) {
-        estadioStore.actualizarEstadio(currentIndex.value, nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
-        isEditing.value = false;
-      } else {
-        estadioStore.agregarEstadio(nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
+    onMounted(async () => {
+      await estadioStore.cargarEstadios();
+    });
+
+    const agregarEstadio = async () => {
+      try {
+        if (isEditing.value) {
+          const estadio = estadioStore.estadios[currentIndex.value];
+          await estadioStore.actualizarEstadio(estadio.idestadio, nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
+          isEditing.value = false;
+        } else {
+          await estadioStore.agregarEstadio(nuevoEstadio.value.nombre, nuevoEstadio.value.capacidad);
+        }
+        nuevoEstadio.value.nombre = '';
+        nuevoEstadio.value.capacidad = '';
+        selectedEstadio.value = null;
+      } catch (err) {
+        alert('Error al guardar estadio: ' + err.message);
       }
-      nuevoEstadio.value.nombre = '';
-      nuevoEstadio.value.capacidad = '';
-      selectedEstadio.value = null;
     };
 
     const seleccionarEstadio = (index) => {
       selectedEstadio.value = index;
       const estadio = estadioStore.estadios[selectedEstadio.value];
-      nuevoEstadio.value.nombre = estadio.nombre;
+      nuevoEstadio.value.nombre = estadio.nomestadio;
       nuevoEstadio.value.capacidad = estadio.capacidad;
       isEditing.value = true;
       currentIndex.value = selectedEstadio.value;
     };
 
-    const eliminarEstadio = () => {
-      estadioStore.eliminarEstadio(selectedEstadio.value);
-      selectedEstadio.value = null;
-      isEditing.value = false;
-      nuevoEstadio.value.nombre = '';
-      nuevoEstadio.value.capacidad = '';
+    const eliminarEstadio = async () => {
+      try {
+        const estadio = estadioStore.estadios[selectedEstadio.value];
+        await estadioStore.eliminarEstadio(estadio.idestadio);
+        selectedEstadio.value = null;
+        isEditing.value = false;
+        nuevoEstadio.value.nombre = '';
+        nuevoEstadio.value.capacidad = '';
+      } catch (err) {
+        alert('Error al eliminar estadio: ' + err.message);
+      }
     };
 
     const cancelarEdicion = () => {
@@ -91,7 +105,7 @@ export default {
       cancelarEdicion,
       tableHeaders: ['Nombre', 'Capacidad'],
       formattedEstadios: computed(() =>
-        estadioStore.estadios.map((estadio) => [estadio.nombre, estadio.capacidad])
+        estadioStore.estadios.map((estadio) => [estadio.nomestadio, estadio.capacidad])
       ),
       isEditing,
       selectedEstadio
@@ -103,8 +117,5 @@ export default {
 <style scoped>
 .main-container {
   margin-top: 50px;
-}
-.table tr.selected {
-  background-color: #d3d3d3;
 }
 </style>

@@ -27,14 +27,23 @@
               {{ item.name }}
             </a>
             <ul class="dropdown-menu" :aria-labelledby="item.id">
-              <router-link
-                v-for="(subItem, subIndex) in item.subItems"
-                :key="subIndex"
-                :to="subItem.to"
-                class="dropdown-item"
-              >
-                {{ subItem.name }}
-              </router-link>
+              <template v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
+                <router-link
+                  v-if="!subItem.action && subItem.to !== '#'"
+                  :to="subItem.to"
+                  class="dropdown-item"
+                >
+                  {{ subItem.name }}
+                </router-link>
+                <a
+                  v-else
+                  href="#"
+                  class="dropdown-item"
+                  @click.prevent="handleMenuItemClick(subItem.action || subItem.name)"
+                >
+                  {{ subItem.name }}
+                </a>
+              </template>
             </ul>
           </li>
         </ul>
@@ -61,7 +70,7 @@ export default {
           id: 'perfilDropdown',
           subItems: [
             { to: '/', name: 'Iniciar sesión' },
-            { to: '/principal', name: 'Cerrar sesión' },
+            { to: '#', name: 'Cerrar sesión', action: 'Cerrar sesión' },
             { to: '/crud-usuario', name: 'Gestión de usuarios' }
           ]
         },
@@ -98,7 +107,7 @@ export default {
   },
   methods: {
     actualizarEstadoUsuario() {
-      this.usuarioActual = "admin";
+      this.usuarioActual = localStorage.getItem('username') || 'Invitado';
     },
     handleMenuItemClick(action) {
       if (action === 'Cerrar sesión') {
@@ -110,8 +119,11 @@ export default {
       }
     },
     cerrarSesion() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('rol');
       this.usuarioActual = null;
-      this.$router.push('/principal');
+      this.$router.push('/');
     }
   }
 };
