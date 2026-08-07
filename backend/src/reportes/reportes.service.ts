@@ -147,6 +147,28 @@ export class ReportesService {
     return data.sort((a, b) => parseFloat(b.audiencia) - parseFloat(a.audiencia));
   }
 
+  async getPartidosPorFecha(fecha: string, estadioName?: string) {
+    const partidos = await this.prisma.partido.findMany({
+      include: { estadio: true, equipoLocal: true, equipoVisitante: true },
+    });
+
+    const filtrados = partidos.filter(p => {
+      const matchFecha = p.fecha ? p.fecha.toISOString().slice(0, 10) === fecha : false;
+      const matchEstadio = estadioName && estadioName !== 'Todos'
+        ? p.estadio.nomestadio.toLowerCase() === estadioName.toLowerCase()
+        : true;
+      return matchFecha && matchEstadio;
+    });
+
+    return filtrados.map(p => ({
+      fecha: p.fecha ? p.fecha.toISOString().slice(0, 10) : '',
+      estadio: p.estadio.nomestadio,
+      local: p.equipoLocal.nomequipo,
+      visitante: p.equipoVisitante.nomequipo,
+      resultado: `${p.goles_local} - ${p.goles_visitante}`,
+    }));
+  }
+
   async enviarReporte(email: string, filename: string, fileBufferLength: number) {
     this.logger.log(`Enviando reporte PDF por correo a: ${email}. Archivo: ${filename} (Tamaño: ${fileBufferLength} bytes)`);
     // Emulación del envío de correo

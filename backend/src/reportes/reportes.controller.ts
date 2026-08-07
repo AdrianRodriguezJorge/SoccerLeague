@@ -35,6 +35,15 @@ export class ReportesController {
     return this.reportesService.getAudiencia();
   }
 
+  @Get('partidos-por-fecha')
+  @ApiOperation({ summary: 'Obtener partidos filtrados por fecha y estadio' })
+  async getPartidosPorFecha(
+    @Query('fecha') fecha: string,
+    @Query('estadio') estadio?: string,
+  ) {
+    return this.reportesService.getPartidosPorFecha(fecha, estadio);
+  }
+
   @Post('enviar-pdf')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Enviar reporte en formato PDF por correo electrónico' })
