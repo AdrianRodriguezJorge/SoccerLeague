@@ -1,80 +1,53 @@
-## Proyecto de Gestión de la Liga Nacional de Fútbol
+# Frontend - Soccer League UI
 
-Este proyecto es una aplicación web para gestionar y visualizar información sobre la Liga Nacional de Fútbol. La aplicación permite a los usuarios iniciar sesión, gestionar la liga, ver reportes y mucho más.
+Esta es la aplicación frontend para **Soccer League**, construida con **Vue 3**, **Vite** y **TailwindCSS**. Provee una interfaz de usuario para gestionar estadios, equipos, partidos y futbolistas, y visualizar reportes.
 
-## Características
+## Requisitos
 
-- **Iniciar sesión**: Formulario de inicio de sesión para los usuarios.
-- **Navbar**: Barra de navegación con menús desplegables para acceder a diferentes secciones de la aplicación.
-- **Gestión de la liga**: Funcionalidades para gestionar estadios, equipos, partidos y futbolistas.
-- **Reportes**: Visualización de diferentes reportes sobre la liga, incluyendo la tabla de posiciones, partidos por equipos, y más.
-
-## Tecnologías Utilizadas
-
-- **Vue.js**: Framework de JavaScript utilizado para construir la interfaz de usuario.
-- **Vue Router**: Biblioteca de enrutamiento para gestionar las rutas de la aplicación.
-- **Bootstrap**: Framework CSS para el diseño y la disposición de la interfaz de usuario.
-- **Pinia**: Biblioteca de gestión del estado para Vue.js.
+- Node.js >= 18
+- npm
 
 ## Instalación
 
-1. **Clonar el repositorio**:
-    ```bash
-    git clone https://github.com/AdrianRodriguezJorge/SoccerLeague.git
-    cd nombre-del-proyecto
-    ```
-
-2. **Instalar dependencias**:
-    ```bash
-    npm install
-    ```
-
-3. **Ejecutar la aplicación en modo de desarrollo**:
-    ```bash
-    npm run dev
-    ```
-
-## Estructura del Proyecto
-
-```
-├── src
-│   ├── assets
-│   ├── common
-│   │   ├── Navbar.vue
-│   │   ├── Button.vue
-│   │   ├── Table.vue
-│   ├── components
-│   │   ├── Login.vue
-│   │   ├── Principal.vue
-│   │   ├── CrudEstadio.vue
-│   │   ├── CrudEquipo.vue
-│   │   ├── CrudPartido.vue
-│   │   ├── CrudFutbolista.vue
-│   ├── router
-│   │   └── index.js
-│   ├── stores
-│   │   ├── equipoStore.js
-│   │   ├── estadioStore.js
-│   │   ├── partidoStore.js
-│   │   ├── futbolistaStore.js
-│   ├── views
-│   │   ├── Reportes
-│   │   │   ├── EstadoEquipo.vue
-│   │   │   ├── PartidosPorEquipos.vue
-│   │   │   ├── PartidosPorFecha.vue
-│   │   │   ├── EntrenadoresExp.vue
-│   │   │   ├── EstadiosMayorAudiencia.vue
-│   │   │   ├── TablaPosiciones.vue
-│   ├── App.vue
-│   ├── main.js
-├── public
-├── package.json
-└── README.md
+```bash
+cd frontend
+npm install
 ```
 
-## Uso
+## Ejecutar en modo desarrollo
 
-1. **Inicio de Sesión**: Ingresa tus credenciales de usuario en el formulario de inicio de sesión.
-2. **Navegación**: Usa la barra de navegación para acceder a diferentes secciones de la aplicación.
-3. **Gestión de la Liga**: Accede a las funcionalidades para gestionar estadios, equipos, partidos y futbolistas.
-4. **Reportes**: Visualiza diferentes reportes sobre la liga desde el menú de reportes.
+```bash
+npm run dev
+```
+
+El servidor de desarrollo se iniciará en `http://localhost:5173` (o el puerto indicado en la consola).
+
+## Tecnologías
+
+- Vue 3
+- Vite
+- TailwindCSS
+- Pinia (state management)
+- Vue Router
+
+## Estructura del proyecto
+
+```
+src/
+├─ assets/          # recursos estáticos
+├─ common/          # componentes comunes (Navbar, Button, Table)
+├─ components/      # componentes CRUD y de funcionalidades
+├─ router/          # gestión de rutas
+├─ stores/          # Pinia stores para datos
+├─ views/           # vistas principales y reportes
+├─ App.vue
+└─ main.js
+```
+
+## Tests
+
+> No se han configurado pruebas unitarias todavía.
+
+## Licencia
+
+MIT
