@@ -16,4 +16,10 @@ export default [
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
   oxlint.configs['flat/recommended'],
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'vue/no-reserved-component-names': 'off',
+    }
+  }
 ]

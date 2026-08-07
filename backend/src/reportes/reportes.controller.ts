@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Query, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReportesService } from './reportes.service';
@@ -24,7 +32,9 @@ export class ReportesController {
   }
 
   @Get('estado-del-equipo')
-  @ApiOperation({ summary: 'Obtener desglose de estado de un equipo por nombre' })
+  @ApiOperation({
+    summary: 'Obtener desglose de estado de un equipo por nombre',
+  })
   async getEstadoDelEquipo(@Query('nombre') nombre: string) {
     return this.reportesService.getEstadoDelEquipo(nombre);
   }
@@ -46,11 +56,10 @@ export class ReportesController {
 
   @Post('enviar-pdf')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Enviar reporte en formato PDF por correo electrónico' })
-  async enviarPdf(
-    @UploadedFile() file: any,
-    @Body('email') email: string,
-  ) {
+  @ApiOperation({
+    summary: 'Enviar reporte en formato PDF por correo electrónico',
+  })
+  async enviarPdf(@UploadedFile() file: any, @Body('email') email: string) {
     const filename = file ? file.originalname : 'reporte.pdf';
     const bufferLength = file ? file.buffer.length : 0;
     return this.reportesService.enviarReporte(email, filename, bufferLength);

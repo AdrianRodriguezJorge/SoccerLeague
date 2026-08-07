@@ -16,11 +16,30 @@ export class EquipoService {
     });
   }
 
-  async createEquipo(data: { nomequipo: string; provincia: string; camparticip: number; campganados: number; mascota: string; color: string; puntos: number }) {
+  async createEquipo(data: {
+    nomequipo: string;
+    provincia: string;
+    camparticip: number;
+    campganados: number;
+    mascota: string;
+    color: string;
+    puntos: number;
+  }) {
     return this.prisma.equipo.create({ data });
   }
 
-  async updateEquipo(id: number, data: { nomequipo?: string; provincia?: string; camparticip?: number; campganados?: number; mascota?: string; color?: string; puntos?: number }) {
+  async updateEquipo(
+    id: number,
+    data: {
+      nomequipo?: string;
+      provincia?: string;
+      camparticip?: number;
+      campganados?: number;
+      mascota?: string;
+      color?: string;
+      puntos?: number;
+    },
+  ) {
     return this.prisma.equipo.update({
       where: { idequipo: id },
       data,

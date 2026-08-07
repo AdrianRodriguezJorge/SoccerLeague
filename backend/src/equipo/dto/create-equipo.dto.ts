@@ -3,7 +3,9 @@ import { IsString, IsInt } from 'class-validator';
 
 export class CreateEquipoDto {
   @ApiProperty()
-  @IsString({ message: 'El nombre del equipo debe ser una cadena de caracteres' })
+  @IsString({
+    message: 'El nombre del equipo debe ser una cadena de caracteres',
+  })
   nomequipo: string;
 
   @ApiProperty()
@@ -11,11 +13,15 @@ export class CreateEquipoDto {
   provincia: string;
 
   @ApiProperty()
-  @IsInt({ message: 'El número de campeonatos participados debe ser un número entero' })
+  @IsInt({
+    message: 'El número de campeonatos participados debe ser un número entero',
+  })
   camparticip: number;
 
   @ApiProperty()
-  @IsInt({ message: 'El número de campeonatos ganados debe ser un número entero' })
+  @IsInt({
+    message: 'El número de campeonatos ganados debe ser un número entero',
+  })
   campganados: number;
 
   @ApiProperty()

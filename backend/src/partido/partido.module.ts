@@ -5,6 +5,6 @@ import { PrismaService } from 'prisma/prisma.service';
 
 @Module({
   controllers: [PartidoController],
-  providers: [PartidoService, PrismaService]
+  providers: [PartidoService, PrismaService],
 })
 export class PartidoModule {}

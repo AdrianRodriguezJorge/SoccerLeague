@@ -11,13 +11,13 @@ export class ReportesService {
     const equipos = await this.prisma.equipo.findMany();
     const partidos = await this.prisma.partido.findMany();
 
-    const tabla = equipos.map(equipo => {
+    const tabla = equipos.map((equipo) => {
       let partidosJugados = 0;
       let ganados = 0;
       let empatados = 0;
       let perdidos = 0;
 
-      partidos.forEach(p => {
+      partidos.forEach((p) => {
         if (p.local === equipo.idequipo) {
           partidosJugados++;
           if (p.goles_local > p.goles_visitante) {
@@ -94,7 +94,7 @@ export class ReportesService {
     let visitanteEmpatados = 0;
     let visitantePerdidos = 0;
 
-    partidos.forEach(p => {
+    partidos.forEach((p) => {
       if (p.local === equipo.idequipo) {
         if (p.goles_local > p.goles_visitante) {
           localGanados++;
@@ -131,12 +131,20 @@ export class ReportesService {
     const estadios = await this.prisma.estadio.findMany();
     const partidos = await this.prisma.partido.findMany();
 
-    const data = estadios.map(estadio => {
-      const partidosDeEstadio = partidos.filter(p => p.fkestadio === estadio.idestadio);
-      const sumAudiencia = partidosDeEstadio.reduce((sum, p) => sum + p.audiencia, 0);
+    const data = estadios.map((estadio) => {
+      const partidosDeEstadio = partidos.filter(
+        (p) => p.fkestadio === estadio.idestadio,
+      );
+      const sumAudiencia = partidosDeEstadio.reduce(
+        (sum, p) => sum + p.audiencia,
+        0,
+      );
       const countPartidos = partidosDeEstadio.length;
       const avgAudiencia = countPartidos > 0 ? sumAudiencia / countPartidos : 0;
-      const pct = estadio.capacidad > 0 ? (avgAudiencia / estadio.capacidad * 100).toFixed(2) : '0.00';
+      const pct =
+        estadio.capacidad > 0
+          ? ((avgAudiencia / estadio.capacidad) * 100).toFixed(2)
+          : '0.00';
 
       return {
         estadio: estadio.nomestadio,
@@ -144,7 +152,9 @@ export class ReportesService {
       };
     });
 
-    return data.sort((a, b) => parseFloat(b.audiencia) - parseFloat(a.audiencia));
+    return data.sort(
+      (a, b) => parseFloat(b.audiencia) - parseFloat(a.audiencia),
+    );
   }
 
   async getPartidosPorFecha(fecha: string, estadioName?: string) {
@@ -152,15 +162,18 @@ export class ReportesService {
       include: { estadio: true, equipoLocal: true, equipoVisitante: true },
     });
 
-    const filtrados = partidos.filter(p => {
-      const matchFecha = p.fecha ? p.fecha.toISOString().slice(0, 10) === fecha : false;
-      const matchEstadio = estadioName && estadioName !== 'Todos'
-        ? p.estadio.nomestadio.toLowerCase() === estadioName.toLowerCase()
-        : true;
+    const filtrados = partidos.filter((p) => {
+      const matchFecha = p.fecha
+        ? p.fecha.toISOString().slice(0, 10) === fecha
+        : false;
+      const matchEstadio =
+        estadioName && estadioName !== 'Todos'
+          ? p.estadio.nomestadio.toLowerCase() === estadioName.toLowerCase()
+          : true;
       return matchFecha && matchEstadio;
     });
 
-    return filtrados.map(p => ({
+    return filtrados.map((p) => ({
       fecha: p.fecha ? p.fecha.toISOString().slice(0, 10) : '',
       estadio: p.estadio.nomestadio,
       local: p.equipoLocal.nomequipo,
@@ -169,8 +182,14 @@ export class ReportesService {
     }));
   }
 
-  async enviarReporte(email: string, filename: string, fileBufferLength: number) {
-    this.logger.log(`Enviando reporte PDF por correo a: ${email}. Archivo: ${filename} (Tamaño: ${fileBufferLength} bytes)`);
+  async enviarReporte(
+    email: string,
+    filename: string,
+    fileBufferLength: number,
+  ) {
+    this.logger.log(
+      `Enviando reporte PDF por correo a: ${email}. Archivo: ${filename} (Tamaño: ${fileBufferLength} bytes)`,
+    );
     // Emulación del envío de correo
     return {
       success: true,

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { PartidoService } from './partido.service';
 import { CreatePartidoDto } from './dto/create-partido.dto';
@@ -33,7 +42,10 @@ export class PartidoController {
   @ApiOperation({ summary: 'Actualizar un partido' })
   @ApiParam({ name: 'id', description: 'ID del partido' })
   @ApiBody({ type: UpdatePartidoDto })
-  async updatePartido(@Param('id', ParseIntPipe) id: number, @Body() data: UpdatePartidoDto) {
+  async updatePartido(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdatePartidoDto,
+  ) {
     return this.partidoService.updatePartido(id, data);
   }
 

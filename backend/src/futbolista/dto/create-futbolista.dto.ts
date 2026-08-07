@@ -7,7 +7,9 @@ export class CreateFutbolistaDto {
   idequipo: number;
 
   @ApiProperty()
-  @IsString({ message: 'El nombre del futbolista debe ser una cadena de caracteres' })
+  @IsString({
+    message: 'El nombre del futbolista debe ser una cadena de caracteres',
+  })
   nombre: string;
 
   @ApiProperty()
@@ -19,6 +21,8 @@ export class CreateFutbolistaDto {
   añosenequipo: number;
 
   @ApiProperty()
-  @IsString({ message: 'El tipo de futbolista debe ser una cadena de caracteres' })
+  @IsString({
+    message: 'El tipo de futbolista debe ser una cadena de caracteres',
+  })
   tipo: string;
 }

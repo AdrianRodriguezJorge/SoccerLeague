@@ -16,11 +16,26 @@ export class FutbolistaService {
     });
   }
 
-  async createFutbolista(data: { idequipo: number; nombre: string; numero: number; añosenequipo: number; tipo: string }) {
+  async createFutbolista(data: {
+    idequipo: number;
+    nombre: string;
+    numero: number;
+    añosenequipo: number;
+    tipo: string;
+  }) {
     return this.prisma.futbolista.create({ data });
   }
 
-  async updateFutbolista(id: number, data: { idequipo?: number; nombre?: string; numero?: number; añosenequipo?: number; tipo?: string }) {
+  async updateFutbolista(
+    id: number,
+    data: {
+      idequipo?: number;
+      nombre?: string;
+      numero?: number;
+      añosenequipo?: number;
+      tipo?: string;
+    },
+  ) {
     return this.prisma.futbolista.update({
       where: { idfutbolista: id },
       data,

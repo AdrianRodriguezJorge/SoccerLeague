@@ -7,8 +7,8 @@ export class CreatePartidoDto {
   audiencia: number;
 
   @ApiProperty()
-  @IsDateString({ 
-    // message: 'La fecha debe ser una fecha válida en formato ISO 8601' 
+  @IsDateString({
+    // message: 'La fecha debe ser una fecha válida en formato ISO 8601'
   })
   fecha: string;
 
@@ -25,10 +25,15 @@ export class CreatePartidoDto {
   visitante: number;
 
   @ApiProperty()
-  @IsInt({ message: 'La cantidad de goles del equipo local debe ser un número entero' })
+  @IsInt({
+    message: 'La cantidad de goles del equipo local debe ser un número entero',
+  })
   goles_local: number;
 
   @ApiProperty()
-  @IsInt({ message: 'La cantidad de goles del equipo visitante debe ser un número entero' })
+  @IsInt({
+    message:
+      'La cantidad de goles del equipo visitante debe ser un número entero',
+  })
   goles_visitante: number;
 }

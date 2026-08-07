@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { EquipoService } from './equipo.service';
 import { CreateEquipoDto } from './dto/create-equipo.dto';
@@ -33,7 +42,10 @@ export class EquipoController {
   @ApiOperation({ summary: 'Actualizar un equipo' })
   @ApiParam({ name: 'id', description: 'ID del equipo' })
   @ApiBody({ type: UpdateEquipoDto })
-  async updateEquipo(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateEquipoDto) {
+  async updateEquipo(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateEquipoDto,
+  ) {
     return this.equipoService.updateEquipo(id, data);
   }
 

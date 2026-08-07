@@ -7,7 +7,7 @@ export class PartidoService {
 
   async getAllPartidos() {
     return this.prisma.partido.findMany({
-      include: { estadio: true, equipoLocal: true, equipoVisitante: true }
+      include: { estadio: true, equipoLocal: true, equipoVisitante: true },
     });
   }
 
@@ -18,13 +18,32 @@ export class PartidoService {
     });
   }
 
-  async createPartido(data: { audiencia: number; fecha: string; fkestadio: number; local: number; visitante: number; goles_local: number; goles_visitante: number }) {
+  async createPartido(data: {
+    audiencia: number;
+    fecha: string;
+    fkestadio: number;
+    local: number;
+    visitante: number;
+    goles_local: number;
+    goles_visitante: number;
+  }) {
     return this.prisma.partido.create({
-      data
+      data,
     });
   }
 
-  async updatePartido(id: number, data: { audiencia?: number; fecha?: string; fkestadio?: number; local?: number; visitante?: number; goles_local?: number; goles_visitante?: number }) {
+  async updatePartido(
+    id: number,
+    data: {
+      audiencia?: number;
+      fecha?: string;
+      fkestadio?: number;
+      local?: number;
+      visitante?: number;
+      goles_local?: number;
+      goles_visitante?: number;
+    },
+  ) {
     return this.prisma.partido.update({
       where: { idpartido: id },
       data,

@@ -8,7 +8,10 @@ export class CreateUsuarioDto {
   nombre: string;
 
   @ApiProperty()
-  @IsEmail({}, { message: 'El email debe ser una dirección de correo electrónico válida' })
+  @IsEmail(
+    {},
+    { message: 'El email debe ser una dirección de correo electrónico válida' },
+  )
   email: string;
 
   @ApiProperty()
@@ -17,6 +20,9 @@ export class CreateUsuarioDto {
   password: string;
 
   @ApiProperty({ enum: Rol })
-  @IsEnum(Rol, { message: 'El rol debe ser uno de los siguientes valores: GESTOR o ADMINISTRADOR' })
+  @IsEnum(Rol, {
+    message:
+      'El rol debe ser uno de los siguientes valores: GESTOR o ADMINISTRADOR',
+  })
   rol: Rol;
 }

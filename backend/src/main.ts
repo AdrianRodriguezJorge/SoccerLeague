@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe, BadRequestException, ValidationError } from '@nestjs/common';
+import {
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+} from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,16 +26,18 @@ async function bootstrap() {
   //   res.redirect('/api');
   // });
 
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    transformOptions: { enableImplicitConversion: true },
-    exceptionFactory: (validationErrors: ValidationError[] = []) => {
-      const messages = validationErrors.map(
-        error => `${Object.values(error.constraints).join(', ')}`
-      );
-      return new BadRequestException(messages);
-    },
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        const messages = validationErrors.map(
+          (error) => `${Object.values(error.constraints).join(', ')}`,
+        );
+        return new BadRequestException(messages);
+      },
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }

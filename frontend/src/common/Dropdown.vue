@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select class="form-control" :id="id" v-model="selectedValue" @change="emitSelection">
+    <select class="form-control" :id="id" v-model="selectedValue">
       <option v-for="(item, index) in items" :key="index" :value="item">
         {{ item }}
       </option>
@@ -21,47 +21,21 @@ export default {
       default: "dropdown",
     },
     modelValue: {
-      type: String,
+      type: [String, Number],
       default: '',
     },
   },
-
+  emits: ['update:modelValue'],
   computed: {
-selectedValue: {
-
-  get() {
-    return this.modelValue;
-
-  },
-
-  set(value) {
-
-    this.$emit('update:modelValue', value);
-
-  },
-
-}
-
-},
-
-  data() {
-    return {
-      selectedValue: this.modelValue,
-    };
-  },
-  watch: {
-    modelValue(newValue) {
-      this.selectedValue = newValue;
+    selectedValue: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      },
     }
-  },
-    selectedValue(newValue) {
-      this.$emit('update:modelValue', newValue);
-    },
-  methods: {
-    emitSelection() {
-      this.$emit('update:modelValue', this.selectedValue);
-    },
-  },
+  }
 };
 </script>
 

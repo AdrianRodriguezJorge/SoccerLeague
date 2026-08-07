@@ -13,19 +13,16 @@ import { ReportesModule } from './reportes/reportes.module';
 
 @Module({
   imports: [
-    EstadioModule, 
-    EquipoModule, 
-    FutbolistaModule, 
-    PartidoModule, 
-    UsuarioModule, 
+    EstadioModule,
+    EquipoModule,
+    FutbolistaModule,
+    PartidoModule,
+    UsuarioModule,
     AuthModule,
     LigaModule,
     ReportesModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    PrismaService, 
-  ],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

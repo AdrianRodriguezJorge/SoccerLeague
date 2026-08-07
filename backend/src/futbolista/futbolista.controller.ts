@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { FutbolistaService } from './futbolista.service';
 import { CreateFutbolistaDto } from './dto/create-futbolista.dto';
@@ -33,7 +42,10 @@ export class FutbolistaController {
   @ApiOperation({ summary: 'Actualizar un futbolista' })
   @ApiParam({ name: 'id', description: 'ID del futbolista' })
   @ApiBody({ type: UpdateFutbolistaDto })
-  async updateFutbolista(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateFutbolistaDto) {
+  async updateFutbolista(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateFutbolistaDto,
+  ) {
     return this.futbolistaService.updateFutbolista(id, data);
   }
 

@@ -19,7 +19,10 @@ export class EstadioService {
     return this.prisma.estadio.create({ data });
   }
 
-  async updateEstadio(id: number, data: { nomestadio?: string; capacidad?: number }) {
+  async updateEstadio(
+    id: number,
+    data: { nomestadio?: string; capacidad?: number },
+  ) {
     return this.prisma.estadio.update({
       where: { idestadio: id },
       data,

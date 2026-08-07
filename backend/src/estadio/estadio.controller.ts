@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { EstadioService } from './estadio.service';
 import { CreateEstadioDto } from './dto/create-estadio.dto';
@@ -41,7 +51,10 @@ export class EstadioController {
   @ApiBody({ type: UpdateEstadioDto })
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Gestor)
-  async updateEstadio(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateEstadioDto) {
+  async updateEstadio(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateEstadioDto,
+  ) {
     return this.estadioService.updateEstadio(id, data);
   }
 

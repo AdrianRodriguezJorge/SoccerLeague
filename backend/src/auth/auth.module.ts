@@ -16,9 +16,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtModule.register({
       global: true,
       secret: JWT_SECRET,
-      signOptions: {expiresIn: '1d'},
+      signOptions: { expiresIn: '1d' },
     }),
-    PassportModule
-  ]
+    PassportModule,
+  ],
 })
 export class AuthModule {}
